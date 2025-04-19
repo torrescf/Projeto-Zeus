@@ -63,16 +63,16 @@ src/ ├── config/ # Configurações de conexão, ambiente, etc.
 
 ### Passos:
 
-# 1. Clone o repositório:
+### 1. Clone o repositório:
 ```bash
 git clone https://github.com/torrescf/Projeto-Zeus.git
 cd Projeto-Zeus
 ```
-# 2. Instale as dependências:
+### 2. Instale as dependências:
 
 npm install
 
-#3. Configure seu banco PostgreSQL e crie um arquivo .env com o seguinte formato:
+### 3. Configure seu banco PostgreSQL e crie um arquivo .env com o seguinte formato:
 
 DB_HOST=localhost
 DB_PORT=5432
@@ -80,7 +80,7 @@ DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
 DB_DATABASE=zeus_db
 
-# 4. Rode as migrations (se aplicável):
+### 4. Rode as migrations (se aplicável):
 
 npm run typeorm migration:run
 
