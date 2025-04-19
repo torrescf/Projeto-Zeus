@@ -25,7 +25,6 @@ let Member = class Member {
 */
     ledProjects;
 };
-exports.Member = Member;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
@@ -54,7 +53,8 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => Project_1.Project, project => project.leader),
     __metadata("design:type", Array)
 ], Member.prototype, "ledProjects", void 0);
-exports.Member = Member = __decorate([
+Member = __decorate([
     (0, typeorm_1.Entity)()
 ], Member);
+exports.Member = Member;
 //# sourceMappingURL=Member.js.map

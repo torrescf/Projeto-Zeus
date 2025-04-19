@@ -18,7 +18,6 @@ let Client = class Client {
     email;
     projects;
 };
-exports.Client = Client;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
@@ -35,7 +34,8 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => Project_1.Project, (project) => project.client),
     __metadata("design:type", Array)
 ], Client.prototype, "projects", void 0);
-exports.Client = Client = __decorate([
+Client = __decorate([
     (0, typeorm_1.Entity)()
 ], Client);
+exports.Client = Client;
 //# sourceMappingURL=Client.js.map
