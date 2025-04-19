@@ -23,21 +23,7 @@ Express.js	Framework minimalista e eficiente para construção de APIs RESTful.
 MySQL	Banco de dados relacional ideal para lidar com entidades conectadas.
 Docker	Containerização do projeto, garantindo portabilidade e facilidade no deploy.
 Insomnia	Ferramenta prática para testar e documentar os endpoints da API.
-🧩 Estrutura do Projeto
-bash
-Copiar
-Editar
-zeus/
-├── src/
-│   ├── controllers/
-│   ├── routes/
-│   ├── services/
-│   ├── models/
-│   └── database/
-├── docker-compose.yml
-├── .env
-├── README.md
-└── ...
+
 🐳 Como executar com Docker
 bash
 Copiar
