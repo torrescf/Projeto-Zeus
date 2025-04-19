@@ -73,19 +73,19 @@ cd Projeto-Zeus
 npm install
 
 ### 3. Configure seu banco PostgreSQL e crie um arquivo .env com o seguinte formato:
-
+```bash
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
 DB_DATABASE=zeus_db
-
+```
 ### 4. Rode as migrations (se aplicável):
-
+```bash
 npm run typeorm migration:run
-
+```
 # 5. Inicie a aplicação em modo desenvolvimento:
-
+```bash
 npm run dev
-
+```
 # 6. Teste os endpoints com o Insomnia ou outro cliente REST.
