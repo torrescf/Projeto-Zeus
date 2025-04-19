@@ -43,4 +43,49 @@ Cliente de API usado para testar os endpoints da aplicação de forma prática e
 ---
 
 ## 📂 Estrutura de Diretórios
+src/ ├── config/ # Configurações de conexão, ambiente, etc.
+     ├── controllers/ # Controladores das rotas 
+     ├── entities/ # Entidades do banco (TypeORM) 
+     ├── routes/ # Definição das rotas da API 
+     ├── services/ # Lógica de negócio 
+     ├── database/ # Migrations e conexões com o banco 
+     └── index.ts # Ponto de entrada da aplicação
 
+
+---
+
+## ⚙️ Como rodar o projeto
+
+### Pré-requisitos
+- Node.js instalado
+- PostgreSQL rodando localmente ou em container
+- Docker (opcional, para futura integração)
+
+### Passos:
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/torrescf/Projeto-Zeus.git
+cd Projeto-Zeus
+
+2. Instale as dependências:
+
+npm install
+
+3. Configure seu banco PostgreSQL e crie um arquivo .env com o seguinte formato:
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=seu_usuario
+DB_PASSWORD=sua_senha
+DB_DATABASE=zeus_db
+
+4. Rode as migrations (se aplicável):
+
+npm run typeorm migration:run
+
+5. Inicie a aplicação em modo desenvolvimento:
+
+npm run dev
+
+6. Teste os endpoints com o Insomnia ou outro cliente REST.
