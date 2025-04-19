@@ -1,37 +1,46 @@
-#💻 Projeto Zeus
-Sistema interno para a Comp Júnior com o objetivo de gerenciar usuários, orçamentos, membros e demais recursos organizacionais.
+# ⚡ Projeto Zeus
 
-Este backend foi desenvolvido como parte do desafio da trilha de especialização da Comp Júnior 2025.1, utilizando tecnologias modernas e seguindo boas práticas de desenvolvimento.
+Sistema backend desenvolvido com foco em organização, escalabilidade e boas práticas de desenvolvimento. O Projeto Zeus é uma API construída em **Node.js** com **TypeScript**, utilizando **PostgreSQL** para persistência de dados, **Docker** para padronização do ambiente, e **Insomnia** para testes de rota.
 
-#🚀 Funcionalidades
-Cadastro e login de usuários
+---
 
-Criação, leitura, atualização e exclusão de orçamentos
+## 🚀 Tecnologias Utilizadas
 
-Relacionamento entre entidades (ex: um usuário pode ser responsável por vários orçamentos)
+### 🟦 TypeScript
+Escolhido por oferecer tipagem estática, melhorando a segurança do código, a experiência de desenvolvimento e a escalabilidade de projetos maiores.
 
-API RESTful com rotas organizadas
+### 🟩 Node.js
+Tecnologia de runtime que permite utilizar JavaScript/TypeScript no backend, com alta performance e uma vasta comunidade. Ideal para aplicações modernas, leves e escaláveis.
 
-Testes de endpoints via Insomnia
+### 🐘 PostgreSQL
+Banco de dados relacional confiável, open source e robusto. Oferece grande compatibilidade com SQL padrão e é amplamente usado em produção.
 
-#🧱 Tecnologias Utilizadas
+### 🔶 TypeORM
+ORM (Object-Relational Mapper) utilizado para abstrair a camada de banco de dados, permitindo interações orientadas a objetos com o PostgreSQL.
 
-Node.js	Plataforma robusta e escalável para desenvolvimento backend.
-TypeScript	Tipagem estática, prevenção de erros em tempo de desenvolvimento.
-Express.js	Framework minimalista e eficiente para construção de APIs RESTful.
-MySQL	Banco de dados relacional ideal para lidar com entidades conectadas.
-Docker	Containerização do projeto, garantindo portabilidade e facilidade no deploy.
-Insomnia	Ferramenta prática para testar e documentar os endpoints da API.
+### 🐳 Docker
+Ferramenta de containerização usada para garantir que o ambiente de desenvolvimento seja idêntico em qualquer máquina. Evita problemas como "funciona na minha máquina".
 
-#🐳 Como executar com Docker
-bash
-Copiar
-Editar
+### 🧪 Insomnia
+Cliente de API usado para testar os endpoints da aplicação de forma prática e organizada durante o desenvolvimento.
 
+### 🧰 Outros
+- Git & GitHub: controle de versão e hospedagem do repositório
+- Visual Studio Code & Visual Studio: editores/IDEs utilizados no projeto
 
-# Crie o arquivo .env com suas variáveis
-cp .env.example .env
+---
 
-# Suba os containers
-docker-compose up --build
-A API estará disponível em http://localhost:3000 (ou porta definida no seu .env)
+## 📌 Funcionalidades Principais
+
+- ✅ CRUD completo de entidades
+- 📁 Organização modular (controllers, services, routes, entities)
+- 🗃️ Integração com banco de dados relacional via TypeORM
+- 🔐 Preparado para autenticação e autorização (em desenvolvimento)
+- 🧪 Testes manuais com Insomnia
+- 🧱 Estrutura pronta para escalabilidade e novas funcionalidades
+- 🐳 Ambiente containerizado com Docker (em progresso/planejado)
+
+---
+
+## 📂 Estrutura de Diretórios
+
