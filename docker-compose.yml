@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:15
+    container_name: zeus_db
+    environment:
+      POSTGRES_USER: zeus_admin
+      POSTGRES_PASSWORD: zeus_password
+      POSTGRES_DB: zeus_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: zeus_api
+    depends_on:
+      db:
+        condition: service_healthy
+    command: npm start
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=zeus_admin
+      - DB_PASSWORD=zeus_password
+      - DB_NAME=zeus_db
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  pgdata:

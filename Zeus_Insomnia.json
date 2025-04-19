@@ -1,0 +1,34 @@
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_date": "2025-04-19T17:00:00.000Z",
+    "__export_source": "insomnia.desktop.app:v2025.1.0",
+    "resources": [
+      {
+        "_id": "req_login",
+        "name": "Login",
+        "url": "http://localhost:3000/auth/login",
+        "method": "POST",
+        "body": {
+          "mimeType": "application/json",
+          "text": "{\n\t\"email\": \"admin@compjunior.com.br\",\n\t\"password\": \"123456\"\n}"
+        }
+      },
+      {
+        "_id": "req_create_member",
+        "name": "Criar Membro",
+        "url": "http://localhost:3000/members",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Bearer {{ token }}"
+          }
+        ],
+        "body": {
+          "mimeType": "application/json",
+          "text": "{\n\t\"name\": \"Novo Membro\",\n\t\"email\": \"membro@compjunior.com.br\",\n\t\"password\": \"123456\",\n\t\"role\": \"member\"\n}"
+        }
+      }
+    ]
+  }

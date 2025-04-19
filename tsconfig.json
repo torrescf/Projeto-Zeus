@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "outDir": "./dist", 
+    "rootDir": "./", 
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "baseUrl": "./", // Certifique-se de que a base é a raiz do projeto
+    "paths": {
+      "@config/*": ["src/config/*"], // Certifique-se de que aponta para src/config
+      "@entities/*": ["src/entities/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@routes/*": ["src/routes/*"]
+    },
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*", "index.ts"], 
+  "exclude": ["node_modules", "dist"] 
+}
