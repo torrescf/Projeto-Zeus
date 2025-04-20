@@ -11,7 +11,7 @@ if (!process.env.DB_HOST || !process.env.DB_PORT || !process.env.DB_USER || !pro
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: process.env.DB_HOST || "localhost",
+    host: process.env.DB_HOST || "db",
     port: parseInt(process.env.DB_PORT || "5432"),
     username: process.env.DB_USER || "zeus_admin",
     password: process.env.DB_PASSWORD || "zeus_password",
