@@ -43,6 +43,7 @@ Cliente de API usado para testar os endpoints da aplicação de forma prática e
 ---
 
 ## 📂 Estrutura de Diretórios
+```bash
 src/ ├── config/ # Configurações de conexão, ambiente, etc.
      ├── controllers/ # Controladores das rotas 
      ├── entities/ # Entidades do banco (TypeORM) 
@@ -50,7 +51,7 @@ src/ ├── config/ # Configurações de conexão, ambiente, etc.
      ├── services/ # Lógica de negócio 
      ├── database/ # Migrations e conexões com o banco 
      └── index.ts # Ponto de entrada da aplicação
-
+```
 
 ---
 
