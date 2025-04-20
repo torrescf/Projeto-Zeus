@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "@config/data-source";
-import { Member } from "@entities/Member";
+import { AppDataSource } from "../config/data-source";
+import { Member } from "../entities/Member";
 
 export class MemberController {
     private memberRepository = AppDataSource.getRepository(Member);

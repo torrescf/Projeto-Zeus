@@ -28,6 +28,10 @@ require("reflect-metadata");
 const typeorm_1 = require("typeorm");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
+if (!process.env.DB_HOST || !process.env.DB_PORT || !process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_NAME) {
+    console.error("Error: Missing required database environment variables.");
+    process.exit(1); // Encerra o processo se as variáveis de ambiente estiverem ausentes
+}
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "postgres",
     host: process.env.DB_HOST || "localhost",
@@ -36,20 +40,21 @@ exports.AppDataSource = new typeorm_1.DataSource({
     password: process.env.DB_PASSWORD || "zeus_password",
     database: process.env.DB_NAME || "zeus_db",
     synchronize: process.env.NODE_ENV !== "production",
-    logging: process.env.NODE_ENV === "development",
+    logging: process.env.NODE_ENV === "development" || process.env.TYPEORM_LOGGING === "true",
     entities: [
-        "src/entities/*.ts"
+        __dirname + "/../entities/*.{ts,js}" // Suporte para arquivos .js em produção
     ],
     migrations: [
-        "src/migrations/*.ts"
+        __dirname + "/../migrations/*.{ts,js}" // Suporte para arquivos .js em produção
     ],
     subscribers: [],
 });
 exports.AppDataSource.initialize()
     .then(() => {
-    console.log("Data Source has been initialized!");
+    console.log("Data Source has been initialized successfully!");
 })
     .catch((err) => {
-    console.error("Error during Data Source initialization", err);
+    console.error("Error during Data Source initialization:", err);
+    process.exit(1); // Encerra o processo em caso de erro
 });
 //# sourceMappingURL=data-source.js.map

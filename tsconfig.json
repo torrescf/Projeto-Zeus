@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
-    "outDir": "./dist", 
-    "rootDir": "./", 
+    "module": "commonjs", // Mantém CommonJS para compatibilidade com Node.js
+    "outDir": "./dist",
+    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true, // Necessário para TypeORM
+    "emitDecoratorMetadata": true, // Necessário para TypeORM
     "strictPropertyInitialization": false,
     "baseUrl": "./", // Certifique-se de que a base é a raiz do projeto
     "paths": {
@@ -22,6 +22,6 @@
     "resolveJsonModule": true,
     "sourceMap": true
   },
-  "include": ["src/**/*", "index.ts"], 
-  "exclude": ["node_modules", "dist"] 
+  "include": ["src/**/*", "index.ts"],
+  "exclude": ["node_modules", "dist"]
 }

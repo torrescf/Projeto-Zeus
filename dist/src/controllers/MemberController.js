@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemberController = void 0;
-const data_source_1 = require("@config/data-source");
-const Member_1 = require("@entities/Member");
+const data_source_1 = require("../config/data-source");
+const Member_1 = require("../entities/Member");
 class MemberController {
     memberRepository = data_source_1.AppDataSource.getRepository(Member_1.Member);
     async create(req, res) {

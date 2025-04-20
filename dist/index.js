@@ -5,14 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const express_1 = __importDefault(require("express"));
-const data_source_1 = require("@config/data-source");
-const member_routes_1 = __importDefault(require("@routes/member.routes"));
+const data_source_1 = require("./src/config/data-source");
+const member_routes_1 = __importDefault(require("./src/routes/member.routes"));
 data_source_1.AppDataSource.initialize()
     .then(() => {
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
     app.use("/members", member_routes_1.default);
-    const port = process.env.PORT || 3000;
+    const port = parseInt(process.env.PORT || "3000", 10);
     app.listen(port, () => {
         console.log(`Server running on port ${port}`);
     });

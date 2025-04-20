@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import express, { Application } from "express";
-import { AppDataSource } from "@config/data-source";
-import memberRoutes from "@routes/member.routes";
+import { AppDataSource } from "../src/config/data-source";
+import memberRoutes from "../src/routes/member.routes";
 
 AppDataSource.initialize()
     .then(() => {
