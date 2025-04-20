@@ -69,9 +69,9 @@ git clone https://github.com/torrescf/Projeto-Zeus.git
 cd Projeto-Zeus
 ```
 ### 2. Instale as dependências:
-
+```bash
 npm install
-
+```
 ### 3. Configure seu banco PostgreSQL e crie um arquivo .env com o seguinte formato:
 ```bash
 DB_HOST=localhost
