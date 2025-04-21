@@ -11,8 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Member = void 0;
 const typeorm_1 = require("typeorm");
-//import { Penalty } from "./Penalty";
-const Project_1 = require("../../src/entities/Project");
+const Budget_1 = require("./Budget");
+const Project_1 = require("./Project");
+const Penalty_1 = require("./Penalty");
 let Member = class Member {
     id;
     name;
@@ -20,11 +21,11 @@ let Member = class Member {
     password;
     role; // 'admin', 'member', 'intern'
     isActive;
-    /*@OneToMany(() => Penalty, penalty => penalty.member)
-    penalties: Penalty[];
-*/
+    budgets;
     ledProjects;
+    penalties;
 };
+exports.Member = Member;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
@@ -50,11 +51,18 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Member.prototype, "isActive", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => Project_1.Project, project => project.leader),
+    (0, typeorm_1.OneToMany)(() => Budget_1.Budget, (budget) => budget.createdBy),
+    __metadata("design:type", Array)
+], Member.prototype, "budgets", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => Project_1.Project, (project) => project.leader),
     __metadata("design:type", Array)
 ], Member.prototype, "ledProjects", void 0);
-Member = __decorate([
-    (0, typeorm_1.Entity)()
+__decorate([
+    (0, typeorm_1.OneToMany)(() => Penalty_1.Penalty, (penalty) => penalty.member),
+    __metadata("design:type", Array)
+], Member.prototype, "penalties", void 0);
+exports.Member = Member = __decorate([
+    (0, typeorm_1.Entity)('members')
 ], Member);
-exports.Member = Member;
 //# sourceMappingURL=Member.js.map

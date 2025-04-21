@@ -1,7 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Project } from "./Project";
+import { Budget } from "./Budget";
 
-@Entity()
+@Entity('clients')
 export class Client {
     @PrimaryGeneratedColumn()
     id: number;
@@ -12,6 +13,12 @@ export class Client {
     @Column()
     email: string;
 
+    @Column({ nullable: true })
+    phone: string;
+
     @OneToMany(() => Project, (project) => project.client)
     projects: Project[];
+
+    @OneToMany(() => Budget, (budget) => budget.client)
+    budgets: Budget[];
 }

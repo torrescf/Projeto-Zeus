@@ -24,6 +24,7 @@ let Project = class Project {
     team;
     client;
 };
+exports.Project = Project;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
@@ -62,8 +63,7 @@ __decorate([
     ,
     __metadata("design:type", Client_1.Client)
 ], Project.prototype, "client", void 0);
-Project = __decorate([
+exports.Project = Project = __decorate([
     (0, typeorm_1.Entity)()
 ], Project);
-exports.Project = Project;
 //# sourceMappingURL=Project.js.map

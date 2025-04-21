@@ -1,17 +1,18 @@
 services:
   db:
-    image: postgres:15
+    image: postgres:17 # Alterado para versão 17
     container_name: zeus_db
     environment:
-      POSTGRES_USER: zeus_admin
-      POSTGRES_PASSWORD: zeus_password
-      POSTGRES_DB: zeus_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 147afj
+      POSTGRES_DB: zeus_admin
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U zeus_admin"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zeus_admin"] # Atualizado
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,18 +23,28 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: npm start
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: 147afj
+      DB_NAME: zeus_admin
+      JWT_SECRET: your_jwt_secret_key
     ports:
       - "3000:3000"
+    command: >
+      sh -c "npx wait-for-it db:5432 -- npm run dev"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=zeus_admin
-      - DB_PASSWORD=zeus_password
-      - DB_NAME=zeus_db
-    volumes:
-      - .:/app
-      - /app/node_modules
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - default  # Mesma rede dos outros serviços    
 
 volumes:
   pgdata:

@@ -1,7 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-//import { Penalty } from "./Penalty";
-import { Project } from "../../src/entities/Project";
-@Entity()
+import { Budget } from "./Budget";
+import { Project } from "./Project";
+import { Penalty } from "./Penalty";
+
+@Entity('members')
 export class Member {
     @PrimaryGeneratedColumn()
     id: number;
@@ -21,9 +23,12 @@ export class Member {
     @Column({ default: false })
     isActive: boolean;
 
-    /*@OneToMany(() => Penalty, penalty => penalty.member)
-    penalties: Penalty[];
-*/
-    @OneToMany(() => Project, project => project.leader)
+    @OneToMany(() => Budget, (budget) => budget.createdBy)
+    budgets: Budget[];
+
+    @OneToMany(() => Project, (project) => project.leader)
     ledProjects: Project[];
+
+    @OneToMany(() => Penalty, (penalty) => penalty.member)
+    penalties: Penalty[];
 }

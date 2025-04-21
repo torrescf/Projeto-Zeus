@@ -1,26 +1,37 @@
 import { Request, Response, NextFunction } from "express";
-import * as jwt from "jsonwebtoken";
-import { AppDataSource } from "../config/data-source"; 
+
+// Extend the Request interface to include userId
+declare global {
+    namespace Express {
+        interface Request {
+            userId?: number;
+        }
+    }
+}
+import jwt from "jsonwebtoken";
+import { AppDataSource } from "../config/data-source";
 import { Member } from "../entities/Member";
 
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    
-    if (!token) {
-        return res.status(401).json({ message: "Token não fornecido" });
-    }
-
+export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: number };
-        const member = await AppDataSource.getRepository(Member).findOne({ where: { id: decoded.id } });
-        
-        if (!member) {
-            return res.status(401).json({ message: "Usuário não encontrado" });
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ message: "Authentication token missing" });
         }
 
-        (req as any).member = member; 
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret_key") as { id: number };
+        const memberRepository = AppDataSource.getRepository(Member);
+        
+        const member = await memberRepository.findOne({ where: { id: decoded.id } });
+        if (!member) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Adiciona o usuário à requisição para uso posterior
+        req.userId = member.id;
         next();
     } catch (error) {
-        return res.status(401).json({ message: "Token inválido" });
+        console.error(error);
+        res.status(401).json({ message: "Invalid or expired token" });
     }
-};
+}

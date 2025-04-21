@@ -2,13 +2,17 @@ import "reflect-metadata";
 import express, { Application } from "express";
 import { AppDataSource } from "../src/config/data-source";
 import memberRoutes from "../src/routes/member.routes";
+import authRoutes from "./routes/auth.routes";
+import budgetRoutes from "./routes/budget.routes";
 
 AppDataSource.initialize()
     .then(() => {
         const app: Application = express();
         app.use(express.json());
 
+        app.use("/auth", authRoutes);
         app.use("/members", memberRoutes);
+        app.use("/budgets", budgetRoutes);
 
         const port: number = parseInt(process.env.PORT || "3000", 10);
         app.listen(port, () => {

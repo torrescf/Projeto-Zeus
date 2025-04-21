@@ -2,20 +2,20 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# 1. Copiar dependências
+# Instalar dependências de compilação
+RUN apk add --no-cache make gcc g++ python3
+
+# Copiar dependências
 COPY package.json package-lock.json tsconfig.json ./
 
-# 2. Instalar dependências
-RUN npm install
+# Instalar dependências de produção
+RUN npm install --only=production
 
-# 3. Copiar o resto do código
+# Copiar o restante do código
 COPY . .
 
-# 4. Build do projeto
-RUN npm run build
-
-# 5. Limpeza
-RUN npm prune --production
-
+# Expor a porta
 EXPOSE 3000
-CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
+
+# Comando para rodar em desenvolvimento
+CMD ["npm", "run", "dev"]

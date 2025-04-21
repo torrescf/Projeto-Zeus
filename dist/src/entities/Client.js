@@ -12,12 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Client = void 0;
 const typeorm_1 = require("typeorm");
 const Project_1 = require("./Project");
+const Budget_1 = require("./Budget");
 let Client = class Client {
     id;
     name;
     email;
+    phone;
     projects;
+    budgets;
 };
+exports.Client = Client;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
@@ -31,11 +35,18 @@ __decorate([
     __metadata("design:type", String)
 ], Client.prototype, "email", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Client.prototype, "phone", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => Project_1.Project, (project) => project.client),
     __metadata("design:type", Array)
 ], Client.prototype, "projects", void 0);
-Client = __decorate([
-    (0, typeorm_1.Entity)()
+__decorate([
+    (0, typeorm_1.OneToMany)(() => Budget_1.Budget, (budget) => budget.client),
+    __metadata("design:type", Array)
+], Client.prototype, "budgets", void 0);
+exports.Client = Client = __decorate([
+    (0, typeorm_1.Entity)('clients')
 ], Client);
-exports.Client = Client;
 //# sourceMappingURL=Client.js.map

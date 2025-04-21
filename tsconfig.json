@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs", // Mantém CommonJS para compatibilidade com Node.js
+    "module": "commonjs", // Ensure CommonJS is used
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,
