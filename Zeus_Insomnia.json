@@ -12,31 +12,190 @@
         "auth_token": "",
         "user_id": "",
         "budget_id": "",
-        "randomEmail": "user@example.com"  
+        "client_id": "",
+        "project_id": "",
+        "test_email": "test@compjunior.com.br",
+        "test_password": "Senha@1234",
+        "test_name": "Usuário Teste"
       }
     },
     {
+      "_type": "request_group",
+      "_id": "grp_setup",
+      "name": "Configuração",
+      "description": "Preparação do ambiente de testes",
+      "metaSortKey": 1
+    },
+    {
       "_type": "request",
-      "_id": "req_generate_email",
-      "name": "[0] Gerar Email Aleatório",
+      "_id": "req_generate_data",
+      "parentId": "grp_setup",
+      "name": "[0] Configurar Dados de Teste",
       "method": "GET",
-      "url": "javascript:",
+      "url": "",
       "body": {
         "mimeType": "application/json",
         "text": ""
       },
-      "tests": "const randomId = Math.floor(Math.random() * 10000);\nconst newEmail = `teste${randomId}@exemplo.com`;\nconsole.log('Email gerado:', newEmail);\nawait insomnia.setVariable('randomEmail', newEmail);\ntests['Email válido gerado'] = newEmail.includes('@');"
+      "tests": "// Gera dados de teste sem chamada HTTP\nconst randomId = Math.floor(Math.random() * 10000);\nconst newEmail = `teste${randomId}@compjunior.com.br`;\nconst newName = `Usuário ${randomId}`;\n\n// Atualiza variáveis de ambiente\nawait insomnia.setVariable('test_email', newEmail);\nawait insomnia.setVariable('test_name', newName);\n\ntests['Dados configurados'] = true;"
+    },
+    {
+      "_type": "request_group",
+      "_id": "grp_auth",
+      "name": "Autenticação",
+      "description": "Gerenciamento de usuários",
+      "metaSortKey": 2
     },
     {
       "_type": "request",
       "_id": "req_register",
-      "name": "[1] Registrar Usuário",
+      "parentId": "grp_auth",
+      "name": "[1] Registrar Membro",
       "method": "POST",
-      "url": "{{base_url}}/auth/register",
+      "url": "{{base_url}}/member",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"name\": \"Usuário Teste\",\n  \"email\": \"{{randomEmail}}\",\n  \"password\": \"Senha@1234\",\n  \"role\": \"member\"\n}"
-      }
+        "text": "{\n  \"name\": \"{{test_name}}\",\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\",\n  \"role\": \"member\"\n}"
+      },
+      "tests": "const responseBody = JSON.parse(response.body);\ntests['Status 201 Created'] = response.status === 201;\ntests['Membro criado'] = !!responseBody.id;\nawait insomnia.setVariable('user_id', responseBody.id);"
+    },
+    {
+      "_type": "request",
+      "_id": "req_login",
+      "parentId": "grp_auth",
+      "name": "[2] Login",
+      "method": "POST",
+      "url": "{{base_url}}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+      },
+      "tests": "const responseBody = JSON.parse(response.body);\ntests['Status 200 OK'] = response.status === 200;\ntests['Token recebido'] = !!responseBody.token;\nawait insomnia.setVariable('auth_token', responseBody.token);"
+    },
+    {
+      "_type": "request_group",
+      "_id": "grp_clients",
+      "name": "Clientes",
+      "description": "Gestão de clientes",
+      "metaSortKey": 3
+    },
+    {
+      "_type": "request",
+      "_id": "req_create_client",
+      "parentId": "grp_clients",
+      "name": "[3] Criar Cliente",
+      "method": "POST",
+      "url": "{{base_url}}/client",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{auth_token}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Cliente {{test_name}}\",\n  \"email\": \"cliente{{$randomInt 1000 9999}}@empresa.com\",\n  \"phone\": \"(11) 9{{$randomInt 1000 9999}}-{{$randomInt 1000 9999}}\"\n}"
+      },
+      "tests": "const responseBody = JSON.parse(response.body);\ntests['Status 201 Created'] = response.status === 201;\ntests['Cliente criado'] = !!responseBody.id;\nawait insomnia.setVariable('client_id', responseBody.id);"
+    },
+    {
+      "_type": "request_group",
+      "_id": "grp_budgets",
+      "name": "Orçamentos",
+      "description": "Gestão de orçamentos",
+      "metaSortKey": 4
+    },
+    {
+      "_type": "request",
+      "_id": "req_create_budget",
+      "parentId": "grp_budgets",
+      "name": "[4] Criar Orçamento",
+      "method": "POST",
+      "url": "{{base_url}}/budget",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{auth_token}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Projeto {{test_name}}\",\n  \"description\": \"Descrição do projeto\",\n  \"amount\": 1500.50,\n  \"status\": \"pending\",\n  \"createdBy\": {{user_id}},\n  \"client\": {{client_id}}\n}"
+      },
+      "tests": "const responseBody = JSON.parse(response.body);\ntests['Status 201 Created'] = response.status === 201;\ntests['Orçamento criado'] = !!responseBody.id;\nawait insomnia.setVariable('budget_id', responseBody.id);"
+    },
+    {
+      "_type": "request",
+      "_id": "req_get_budgets",
+      "parentId": "grp_budgets",
+      "name": "[5] Listar Orçamentos",
+      "method": "GET",
+      "url": "{{base_url}}/budget",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{auth_token}}"
+        }
+      ],
+      "tests": "const responseBody = JSON.parse(response.body);\ntests['Status 200 OK'] = response.status === 200;\ntests['Retorna array'] = Array.isArray(responseBody);"
+    },
+    {
+      "_type": "request_group",
+      "_id": "grp_projects",
+      "name": "Projetos",
+      "description": "Gestão de projetos",
+      "metaSortKey": 5
+    },
+    {
+      "_type": "request",
+      "_id": "req_create_project",
+      "parentId": "grp_projects",
+      "name": "[6] Criar Projeto",
+      "method": "POST",
+      "url": "{{base_url}}/project",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{auth_token}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Projeto {{test_name}}\",\n  \"description\": \"Descrição do projeto\",\n  \"status\": \"planning\",\n  \"startDate\": \"{{$datetime 'YYYY-MM-DD' 0}}\",\n  \"leader\": {{user_id}},\n  \"client\": {{client_id}}\n}"
+      },
+      "tests": "const responseBody = JSON.parse(response.body);\ntests['Status 201 Created'] = response.status === 201;\ntests['Projeto criado'] = !!responseBody.id;\nawait insomnia.setVariable('project_id', responseBody.id);"
+    },
+    {
+      "_type": "request",
+      "_id": "req_healthcheck",
+      "name": "[7] Health Check",
+      "method": "GET",
+      "url": "{{base_url}}/healthcheck",
+      "tests": "tests['Status 200 OK'] = response.status === 200;\ntests['API Online'] = response.body.status === 'OK';"
     }
   ]
 }
