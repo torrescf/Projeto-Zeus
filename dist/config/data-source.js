@@ -41,6 +41,7 @@ const Member_1 = require("../entities/Member");
 const Project_1 = require("../entities/Project");
 const Client_1 = require("../entities/Client");
 const Budget_1 = require("../entities/Budget");
+const BudgetHistory_1 = require("../entities/BudgetHistory"); // Adicionado
 const Penalty_1 = require("../entities/Penalty");
 const Equipment_1 = require("../entities/Equipment");
 dotenv.config();
@@ -57,7 +58,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     database: process.env.DB_NAME || "zeus_admin",
     synchronize: false, // Mantenha false quando usar migrações
     logging: true,
-    entities: [Member_1.Member, Project_1.Project, Client_1.Client, Budget_1.Budget, Penalty_1.Penalty, Equipment_1.Equipment],
+    entities: [Member_1.Member, Project_1.Project, Client_1.Client, Budget_1.Budget, BudgetHistory_1.BudgetHistory, Penalty_1.Penalty, Equipment_1.Equipment], // Adicionado BudgetHistory
     migrations: ["src/migrations/*.ts"], // Caminho corrigido
     subscribers: [],
 });

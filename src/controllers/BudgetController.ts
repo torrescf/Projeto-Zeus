@@ -3,8 +3,12 @@ import { AppDataSource } from "../config/data-source";
 import { Budget } from "../entities/Budget";
 import { Member } from "../entities/Member";
 import { Client } from "../entities/Client";
+import { sendBudgetStatusEmail, sendBudgetStatusNotification } from "../services/emailService";
+import { BudgetService } from "../services/budgetService";
 
 export class BudgetController {
+    private budgetService = new BudgetService();
+
     async create(req: Request, res: Response) {
         try {
             const { title, description, amount, clientId } = req.body;
@@ -35,16 +39,24 @@ export class BudgetController {
             res.status(201).json(budget);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal server error" });
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            res.status(500).json({ message: errorMessage });
         }
     }
 
     async getAll(req: Request, res: Response) {
         try {
+            const { status, memberId } = req.query;
             const budgetRepository = AppDataSource.getRepository(Budget);
+
             const budgets = await budgetRepository.find({
+                where: {
+                    ...(status && { status: status as string }),
+                    ...(memberId && { createdBy: { id: Number(memberId) } })
+                } as any, // Explicitly cast to avoid type errors
                 relations: ["createdBy", "client"]
             });
+
             res.json(budgets);
         } catch (error) {
             console.error(error);
@@ -67,7 +79,8 @@ export class BudgetController {
             res.json(budget);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal server error" });
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            res.status(500).json({ message: errorMessage });
         }
     }
 
@@ -83,7 +96,8 @@ export class BudgetController {
             res.status(200).json({ message: "Budget updated successfully" });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal server error" });
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            res.status(500).json({ message: errorMessage });
         }
     }
 
@@ -99,7 +113,29 @@ export class BudgetController {
             res.status(200).json({ message: "Budget deleted successfully" });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal server error" });
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            res.status(500).json({ message: errorMessage });
+        }
+    }
+
+    async updateStatus(req: Request, res: Response) {
+        const { id } = req.params;
+        const { status } = req.body;
+        const changedBy = req.user as Member;
+
+        try {
+            const budgetRepository = AppDataSource.getRepository(Budget);
+            const budget = await budgetRepository.findOneBy({ id: parseInt(id) });
+            if (!budget) return res.status(404).json({ message: "Budget not found" });
+
+            const previousStatus = budget.status;
+            await this.budgetService.updateBudget(Number(id), { status }, changedBy);
+
+            await sendBudgetStatusNotification(budget, previousStatus);
+            res.sendStatus(200);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            res.status(500).send(errorMessage);
         }
     }
 }

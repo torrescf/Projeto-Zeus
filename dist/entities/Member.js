@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Member = void 0;
 const typeorm_1 = require("typeorm");
+const class_validator_1 = require("class-validator");
 const Budget_1 = require("./Budget");
 const Project_1 = require("./Project");
 const Penalty_1 = require("./Penalty");
@@ -21,6 +22,12 @@ let Member = class Member {
     password;
     role; // 'admin', 'member', 'intern'
     isActive;
+    resetPasswordToken;
+    resetPasswordExpires;
+    skills;
+    gender;
+    phone;
+    photo;
     budgets;
     ledProjects;
     penalties;
@@ -36,6 +43,10 @@ __decorate([
 ], Member.prototype, "name", void 0);
 __decorate([
     (0, typeorm_1.Column)({ unique: true }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.Matches)(/^[\w-.]+@compjunior\.com\.br$/, {
+        message: 'O e-mail deve pertencer ao domínio @compjunior.com.br',
+    }),
     __metadata("design:type", String)
 ], Member.prototype, "email", void 0);
 __decorate([
@@ -50,6 +61,30 @@ __decorate([
     (0, typeorm_1.Column)({ default: false }),
     __metadata("design:type", Boolean)
 ], Member.prototype, "isActive", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Member.prototype, "resetPasswordToken", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
+    __metadata("design:type", Date)
+], Member.prototype, "resetPasswordExpires", void 0);
+__decorate([
+    (0, typeorm_1.Column)("simple-array", { nullable: true }),
+    __metadata("design:type", Array)
+], Member.prototype, "skills", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Member.prototype, "gender", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Member.prototype, "phone", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Member.prototype, "photo", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => Budget_1.Budget, (budget) => budget.createdBy),
     __metadata("design:type", Array)

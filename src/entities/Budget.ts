@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { Member } from "./Member";
 import { Client } from "./Client";
+import { BudgetHistory } from "./BudgetHistory";
 
 @Entity('budgets')
 export class Budget {
@@ -27,4 +28,7 @@ export class Budget {
 
     @ManyToOne(() => Client, (client) => client.budgets)
     client: Client;
+
+    @OneToMany(() => BudgetHistory, (history) => history.budget)
+    history: BudgetHistory[];
 }

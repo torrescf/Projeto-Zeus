@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { IsEmail, Matches } from "class-validator";
 import { Budget } from "./Budget";
 import { Project } from "./Project";
 import { Penalty } from "./Penalty";
@@ -12,6 +13,10 @@ export class Member {
     name: string;
 
     @Column({ unique: true })
+    @IsEmail()
+    @Matches(/^[\w-.]+@compjunior\.com\.br$/, {
+        message: 'O e-mail deve pertencer ao domínio @compjunior.com.br',
+    })
     email: string;
 
     @Column()
@@ -22,6 +27,24 @@ export class Member {
 
     @Column({ default: false })
     isActive: boolean;
+
+    @Column({ nullable: true })
+    resetPasswordToken: string;
+
+    @Column({ type: "timestamp", nullable: true })
+    resetPasswordExpires: Date;
+
+    @Column("simple-array", { nullable: true })
+    skills: string[];
+
+    @Column({ nullable: true })
+    gender: "male" | "female" | "other";
+
+    @Column({ nullable: true })
+    phone: string;
+
+    @Column({ nullable: true })
+    photo: string;
 
     @OneToMany(() => Budget, (budget) => budget.createdBy)
     budgets: Budget[];

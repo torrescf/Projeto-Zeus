@@ -90,3 +90,36 @@ npm run typeorm migration:run
 npm run dev
 ```
 # 6. Teste os endpoints com o Insomnia ou outro cliente REST.
+
+## **📌 Exemplos de Requests**
+
+### **Autenticação**
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "usuario@compjunior.com.br",
+  "password": "sua_senha"
+}
+```
+
+### **Atualizar Status de Orçamento**
+```http
+PATCH /budgets/:id/status
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "APPROVED"
+}
+```
+
+## **⚙️ Variáveis de Ambiente**
+```env
+DB_HOST=db
+DB_PORT=5432
+JWT_SECRET=seu_secreto_aqui
+EMAIL_USER=seu_email@gmail.com
+EMAIL_PASS=senha_do_email
+```

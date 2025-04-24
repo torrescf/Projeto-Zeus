@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.app = void 0;
 require("reflect-metadata");
 const express_1 = __importDefault(require("express"));
 const data_source_1 = require("./config/data-source");
@@ -11,11 +12,12 @@ const budget_routes_1 = __importDefault(require("./routes/budget.routes"));
 const member_routes_1 = __importDefault(require("./routes/member.routes"));
 // Debug inicial
 console.log('[INIT] Iniciando servidor...');
+let app;
 data_source_1.AppDataSource.initialize()
     .then(() => {
     console.log('[DB] Data Source inicializado com sucesso');
-    const app = (0, express_1.default)();
-    const port = process.env.PORT || 3000;
+    exports.app = app = (0, express_1.default)();
+    const port = process.env.PORT || 4001; // Alterar para uma porta diferente
     // ======================
     // Middlewares (ORDEM É CRÍTICA)
     // ======================

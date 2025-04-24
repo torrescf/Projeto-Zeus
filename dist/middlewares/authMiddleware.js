@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isAdmin = void 0;
 exports.authMiddleware = authMiddleware;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const data_source_1 = require("../config/data-source");
@@ -21,6 +22,7 @@ async function authMiddleware(req, res, next) {
         }
         // Adiciona o usuário à requisição para uso posterior
         req.userId = member.id;
+        req.user = member;
         next();
     }
     catch (error) {
@@ -28,4 +30,11 @@ async function authMiddleware(req, res, next) {
         res.status(401).json({ message: "Invalid or expired token" });
     }
 }
+const isAdmin = (req, res, next) => {
+    if (req.user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Acesso negado.' });
+    }
+    next();
+};
+exports.isAdmin = isAdmin;
 //# sourceMappingURL=authMiddleware.js.map

@@ -8,12 +8,14 @@ import memberRoutes from './routes/member.routes';
 // Debug inicial
 console.log('[INIT] Iniciando servidor...');
 
+let app: Application;
+
 AppDataSource.initialize()
   .then(() => {
     console.log('[DB] Data Source inicializado com sucesso');
     
-    const app: Application = express();
-    const port = process.env.PORT || 3000;
+    app = express();
+    const port = process.env.PORT || 4001; // Alterar para uma porta diferente
 
     // ======================
     // Middlewares (ORDEM É CRÍTICA)
@@ -93,3 +95,5 @@ AppDataSource.initialize()
     console.error('[FATAL] Falha na inicialização:', error);
     process.exit(1);
   });
+
+export { app };

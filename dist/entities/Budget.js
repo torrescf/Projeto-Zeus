@@ -13,6 +13,7 @@ exports.Budget = void 0;
 const typeorm_1 = require("typeorm");
 const Member_1 = require("./Member");
 const Client_1 = require("./Client");
+const BudgetHistory_1 = require("./BudgetHistory");
 let Budget = class Budget {
     id;
     title;
@@ -22,6 +23,7 @@ let Budget = class Budget {
     createdAt;
     createdBy;
     client;
+    history;
 };
 exports.Budget = Budget;
 __decorate([
@@ -56,6 +58,10 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => Client_1.Client, (client) => client.budgets),
     __metadata("design:type", Client_1.Client)
 ], Budget.prototype, "client", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => BudgetHistory_1.BudgetHistory, (history) => history.budget),
+    __metadata("design:type", Array)
+], Budget.prototype, "history", void 0);
 exports.Budget = Budget = __decorate([
     (0, typeorm_1.Entity)('budgets')
 ], Budget);

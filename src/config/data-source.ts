@@ -5,6 +5,7 @@ import { Member } from "../entities/Member";
 import { Project } from "../entities/Project";
 import { Client } from "../entities/Client";
 import { Budget } from "../entities/Budget";
+import { BudgetHistory } from "../entities/BudgetHistory"; // Adicionado
 import { Penalty } from "../entities/Penalty";
 import { Equipment } from "../entities/Equipment";
 
@@ -24,7 +25,7 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME || "zeus_admin",
     synchronize: false, // Mantenha false quando usar migrações
     logging: true,
-    entities: [Member, Project, Client, Budget, Penalty, Equipment],
+    entities: [Member, Project, Client, Budget, BudgetHistory, Penalty, Equipment], // Adicionado BudgetHistory
     migrations: ["src/migrations/*.ts"], // Caminho corrigido
     subscribers: [],
 });

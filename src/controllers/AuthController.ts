@@ -3,6 +3,9 @@ import { AppDataSource } from "../config/data-source";
 import { Member } from "../entities/Member";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+import { MoreThan, Column } from "typeorm";
 
 export class AuthController {
     private memberRepository = AppDataSource.getRepository(Member);
@@ -117,6 +120,88 @@ export class AuthController {
                 message: "Internal server error",
                 error: error instanceof Error ? error.message : "Unknown error"
             });
+        }
+    }
+
+    async forgotPassword(req: Request, res: Response) {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                return res.status(400).json({ message: "Email is required" });
+            }
+
+            const member = await this.memberRepository.findOne({ where: { email } });
+            if (!member) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            // Generate a reset token
+            const resetToken = crypto.randomBytes(32).toString("hex");
+            const resetTokenHash = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+            // Save the hashed token and expiration in the database
+            member.resetPasswordToken = resetTokenHash;
+            member.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+            await this.memberRepository.save(member);
+
+            // Send email with the reset token
+            const transporter = nodemailer.createTransport({
+                service: "Gmail",
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+
+            const resetUrl = `${req.protocol}://${req.get("host")}/auth/reset-password/${resetToken}`;
+            const message = `You requested a password reset. Click the link to reset your password: ${resetUrl}`;
+
+            await transporter.sendMail({
+                to: email,
+                subject: "Password Reset Request",
+                text: message,
+            });
+
+            res.status(200).json({ message: "Password reset email sent" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    async resetPassword(req: Request, res: Response) {
+        try {
+            const { token } = req.params;
+            const { password } = req.body;
+
+            if (!password) {
+                return res.status(400).json({ message: "Password is required" });
+            }
+
+            const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+            const member = await this.memberRepository.findOne({
+                where: {
+                    resetPasswordToken: resetTokenHash,
+                    resetPasswordExpires: MoreThan(new Date()),
+                },
+            });
+
+            if (!member) {
+                return res.status(400).json({ message: "Invalid or expired token" });
+            }
+
+            // Update the password
+            member.password = await bcrypt.hash(password, 10);
+            member.resetPasswordToken = null as unknown as string; // Corrigido para evitar erro de tipo
+            member.resetPasswordExpires = null as unknown as Date;
+            await this.memberRepository.save(member);
+
+            res.status(200).json({ message: "Password reset successfully" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 }

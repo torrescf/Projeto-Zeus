@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
-// Extend the Request interface to include userId
+// Extend the Request interface to include user
 declare global {
     namespace Express {
         interface Request {
+            user?: Member;
             userId?: number;
         }
     }
@@ -29,9 +30,17 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 
         // Adiciona o usuário à requisição para uso posterior
         req.userId = member.id;
+        req.user = member;
         next();
     } catch (error) {
         console.error(error);
         res.status(401).json({ message: "Invalid or expired token" });
     }
 }
+
+export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+    if (req.user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Acesso negado.' });
+    }
+    next();
+};
