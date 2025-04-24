@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFromContainer = exports.useContainer = void 0;
+exports.useContainer = useContainer;
+exports.getFromContainer = getFromContainer;
 /**
  * Container to be used by this library for inversion control. If container was not implicitly set then by default
  * container simply creates a new instance of the given class.
@@ -27,7 +28,6 @@ function useContainer(iocContainer, options) {
     userContainer = iocContainer;
     userContainerOptions = options;
 }
-exports.useContainer = useContainer;
 /**
  * Gets the IOC container used by this library.
  */
@@ -47,5 +47,4 @@ function getFromContainer(someClass) {
     }
     return defaultContainer.get(someClass);
 }
-exports.getFromContainer = getFromContainer;
 //# sourceMappingURL=container.js.map

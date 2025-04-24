@@ -1,13 +1,16 @@
-﻿-- Cria a extensão para UUIDs (executa no banco template1 primeiro)
-\c template1
+﻿\connect template1
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Cria o banco zeus_admin se não existir (sintaxe correta)
-SELECT 'CREATE DATABASE zeus_admin'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'zeus_admin')\gexec
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'zeus_admin') THEN
+        PERFORM dblink_exec('dbname=postgres', 'CREATE DATABASE zeus_admin');
+    END IF;
+END $$;
 
 -- Conecta ao banco zeus_admin
-\c zeus_admin
+\connect zeus_admin
 
 -- Recria a extensão no banco zeus_admin
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

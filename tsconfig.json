@@ -1,27 +1,28 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs", // Ensure CommonJS is used
+    "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "experimentalDecorators": true, // Necessário para TypeORM
-    "emitDecoratorMetadata": true, // Necessário para TypeORM
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
-    "baseUrl": "./", // Certifique-se de que a base é a raiz do projeto
+    "baseUrl": "./src",
     "paths": {
-      "@config/*": ["src/config/*"], // Certifique-se de que aponta para src/config
-      "@entities/*": ["src/entities/*"],
-      "@controllers/*": ["src/controllers/*"],
-      "@routes/*": ["src/routes/*"]
+      "@config/*": ["config/*"],
+      "@entities/*": ["entities/*"],
+      "@controllers/*": ["controllers/*"],
+      "@routes/*": ["routes/*"],
+      "@middlewares/*": ["middlewares/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true
   },
-  "include": ["src/**/*", "index.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

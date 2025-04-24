@@ -1,21 +1,19 @@
-FROM node:18-alpine
+FROM node:18-alpine AS base
 
 WORKDIR /app
 
-# Instalar dependências de compilação
-RUN apk add --no-cache make gcc g++ python3
+# Instalar dependências
+COPY package.json package-lock.json ./
+RUN npm install
 
-# Copiar dependências
-COPY package.json package-lock.json tsconfig.json ./
-
-# Instalar dependências de produção
-RUN npm install --only=production
-
-# Copiar o restante do código
+# Copiar código
 COPY . .
 
-# Expor a porta
-EXPOSE 3000
+# Build para produção
+FROM base AS production
+RUN npm run build
+CMD ["node", "dist/index.js"]
 
-# Comando para rodar em desenvolvimento
+# Desenvolvimento
+FROM base AS development
 CMD ["npm", "run", "dev"]

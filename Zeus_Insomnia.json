@@ -1,40 +1,42 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2025-04-21T00:00:00.000Z",
   "__export_source": "insomnia.desktop.app:v2025.1.0",
   "resources": [
     {
-      "_id": "req_login",
-      "name": "Login",
-      "url": "http://localhost:3000/auth/login",
-      "method": "POST",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"email\": \"admin@compjunior.com.br\",\n  \"password\": \"123456\"\n}"
+      "_type": "environment",
+      "_id": "env_global",
+      "name": "Global Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "auth_token": "",
+        "user_id": "",
+        "budget_id": "",
+        "randomEmail": "user@example.com"  
       }
     },
     {
-      "_id": "req_create_member",
-      "name": "Criar Membro",
-      "url": "http://localhost:3000/members",
-      "method": "POST",
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"name\": \"Novo Membro\",\n  \"email\": \"membro@compjunior.com.br\",\n  \"password\": \"123456\",\n  \"role\": \"member\"\n}"
-      }
-    },
-    {
-      "_id": "req_get_members",
-      "name": "Listar Membros",
-      "url": "http://localhost:3000/members",
+      "_type": "request",
+      "_id": "req_generate_email",
+      "name": "[0] Gerar Email Aleatório",
       "method": "GET",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ token }}"
-        }
-      ]
+      "url": "javascript:",
+      "body": {
+        "mimeType": "application/json",
+        "text": ""
+      },
+      "tests": "const randomId = Math.floor(Math.random() * 10000);\nconst newEmail = `teste${randomId}@exemplo.com`;\nconsole.log('Email gerado:', newEmail);\nawait insomnia.setVariable('randomEmail', newEmail);\ntests['Email válido gerado'] = newEmail.includes('@');"
+    },
+    {
+      "_type": "request",
+      "_id": "req_register",
+      "name": "[1] Registrar Usuário",
+      "method": "POST",
+      "url": "{{base_url}}/auth/register",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Usuário Teste\",\n  \"email\": \"{{randomEmail}}\",\n  \"password\": \"Senha@1234\",\n  \"role\": \"member\"\n}"
+      }
     }
   ]
 }

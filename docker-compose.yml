@@ -1,6 +1,21 @@
 services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      # Remova as configurações de email não utilizadas
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - default
+
   db:
-    image: postgres:17 # Alterado para versão 17
+    image: postgres:16
     container_name: zeus_db
     environment:
       POSTGRES_USER: postgres
@@ -12,10 +27,12 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d zeus_admin"] # Atualizado
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zeus_admin"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - default
 
   api:
     build: .
@@ -29,22 +46,24 @@ services:
       DB_USER: postgres
       DB_PASSWORD: 147afj
       DB_NAME: zeus_admin
-      JWT_SECRET: your_jwt_secret_key
+      BODY_PARSER_LIMIT: 50mb
+      PORT: 3000
+      JWT_SECRET: "sua_chave_secreta_forte_aqui"
+      NODE_ENV: development
     ports:
-      - "3000:3000"
-    command: >
-      sh -c "npx wait-for-it db:5432 -- npm run dev"
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
+      - "3000:3000"  # Mapeamento direto da porta
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    command: sh -c "npm run dev"  # Removido o wait-for-it
     networks:
-      - default  # Mesma rede dos outros serviços    
+      - default
+
+networks:
+  default:
+    name: projeto-zeus_default
+    driver: bridge
 
 volumes:
   pgdata:
