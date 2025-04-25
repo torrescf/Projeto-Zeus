@@ -44,3 +44,6 @@ dist/
 
 # Insomnia export file
 Zeus_Insomnia.json
+
+# Log files
+logfile
