@@ -99,5 +99,5 @@ EMAIL_PASS= sua senha
 
 ## ✍🏻 Autor
 
-| [<img src="https://avatars.githubusercontent.com/u/120669342?v=4" width=115><br><sub>João Pedro Oliveira</sub>](https://github.com/torrescf) |
+| [<img src="https://avatars.githubusercontent.com/u/91806052?v=4" width=115><br><sub>João Pedro Oliveira</sub>](https://github.com/torrescf) |
 | :---: |
