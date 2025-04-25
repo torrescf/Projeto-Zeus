@@ -1,3 +1,6 @@
+// Entidade que representa penalidades aplicadas a membros.
+// Inclui informações como tipo, motivo e data.
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Member } from "./Member";
 

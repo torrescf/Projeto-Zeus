@@ -1,3 +1,6 @@
+// Entidade que representa um membro no banco de dados.
+// Inclui informações pessoais, permissões e relacionamentos.
+
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { IsEmail, Matches } from "class-validator";
 import { Budget } from "./Budget";

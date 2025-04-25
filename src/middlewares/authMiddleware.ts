@@ -1,3 +1,6 @@
+// Middleware para autenticação e autorização de usuários.
+// Verifica tokens JWT e valida permissões de administrador.
+
 import { Request, Response, NextFunction } from "express";
 
 // Extend the Request interface to include user

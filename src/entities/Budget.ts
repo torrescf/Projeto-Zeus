@@ -1,3 +1,6 @@
+// Entidade que representa um orçamento no banco de dados.
+// Relaciona-se com membros, clientes e histórico de alterações.
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { Member } from "./Member";
 import { Client } from "./Client";

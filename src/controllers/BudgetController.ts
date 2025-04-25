@@ -1,3 +1,6 @@
+// Controlador responsável por gerenciar orçamentos.
+// Inclui métodos para criação, listagem, atualização e exclusão.
+
 import { NextFunction, Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { Budget } from "../entities/Budget";

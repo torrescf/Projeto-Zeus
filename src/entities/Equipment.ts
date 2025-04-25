@@ -1,3 +1,6 @@
+// Entidade que representa equipamentos no sistema.
+// Inclui informações como nome, descrição e datas de criação/atualização.
+
 export class Equipment {
     id: string;
     name: string;

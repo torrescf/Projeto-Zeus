@@ -1,3 +1,6 @@
+// Configuração da conexão com o banco de dados utilizando TypeORM.
+// Inclui entidades, migrações e variáveis de ambiente.
+
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";

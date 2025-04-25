@@ -1,3 +1,6 @@
+// Serviço responsável por enviar e-mails, como redefinição de senha e notificações.
+// Utiliza o Nodemailer para gerenciar o envio de mensagens.
+
 import nodemailer from 'nodemailer';
 import { Budget } from "../entities/Budget";
 

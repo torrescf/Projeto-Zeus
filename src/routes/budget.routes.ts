@@ -1,3 +1,6 @@
+// Define as rotas relacionadas aos orçamentos, como criação, listagem e atualização.
+// Aplica middleware de autenticação para proteger as rotas.
+
 import { Router } from "express";
 import { BudgetController } from "../controllers/BudgetController";
 import { authMiddleware } from "../middlewares/authMiddleware";

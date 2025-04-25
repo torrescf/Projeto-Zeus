@@ -1,3 +1,6 @@
+// Entidade que representa um cliente no banco de dados.
+// Relaciona-se com projetos e orçamentos.
+
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Project } from "./Project";
 import { Budget } from "./Budget";

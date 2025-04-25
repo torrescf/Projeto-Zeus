@@ -1,3 +1,6 @@
+// Middleware para upload de arquivos, com validação de tipo e tamanho.
+// Suporta apenas imagens nos formatos JPG e PNG.
+
 import multer, { FileFilterCallback } from 'multer';
 import { Request } from 'express';
 

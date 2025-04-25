@@ -1,3 +1,6 @@
+// Testes automatizados para endpoints de autenticação.
+// Inclui casos de teste para login e proteção contra força bruta.
+
 import request from "supertest";
 import { app } from "../index"; // Certifique-se de exportar o `app` no arquivo `index.ts`
 

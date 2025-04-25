@@ -1,3 +1,6 @@
+// Ponto de entrada principal da aplicação.
+// Configura o servidor Express, middlewares e rotas.
+
 import 'reflect-metadata';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import { AppDataSource } from './config/data-source';

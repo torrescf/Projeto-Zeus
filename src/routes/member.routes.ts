@@ -1,3 +1,6 @@
+// Define as rotas relacionadas aos membros, como criação, listagem e exclusão.
+// Aplica middlewares de autenticação e autorização.
+
 import { Router } from "express";
 import { MemberController } from "../controllers/MemberController";
 import { authMiddleware, isAdmin } from "../middlewares/authMiddleware";

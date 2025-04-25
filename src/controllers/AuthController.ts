@@ -1,3 +1,6 @@
+// Controlador responsável por autenticação e gerenciamento de usuários.
+// Inclui métodos para login, registro, recuperação e redefinição de senha.
+
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { Member } from "../entities/Member";

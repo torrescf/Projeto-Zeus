@@ -1,3 +1,6 @@
+// Controlador responsável por gerenciar membros.
+// Inclui métodos para criação, listagem, atualização e exclusão.
+
 import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { Member } from "../entities/Member";

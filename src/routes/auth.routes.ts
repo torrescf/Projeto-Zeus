@@ -1,3 +1,6 @@
+// Define as rotas de autenticação, como login, registro e recuperação de senha.
+// Inclui proteção contra ataques de força bruta com rate limiting.
+
 import { Router } from "express";
 import { AuthController } from "../controllers/AuthController";
 import { loginLimiter } from "../middlewares/rateLimit";

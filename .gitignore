@@ -32,3 +32,15 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Node.js dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+
+# Insomnia export file
+Zeus_Insomnia.json

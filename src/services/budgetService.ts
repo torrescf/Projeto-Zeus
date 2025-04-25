@@ -1,3 +1,6 @@
+// Serviço responsável por gerenciar orçamentos, incluindo atualizações e histórico.
+// Centraliza a lógica de negócios relacionada a orçamentos.
+
 import { AppDataSource } from "../config/data-source";
 import { Budget } from "../entities/Budget";
 import { BudgetHistory } from "../entities/BudgetHistory";

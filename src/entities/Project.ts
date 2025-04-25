@@ -1,3 +1,6 @@
+// Entidade que representa um projeto no banco de dados.
+// Relaciona-se com membros e clientes.
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTable } from "typeorm";
 import { Member } from "./Member";
 import { Client } from "./Client"; // Corrigido o caminho relativo

@@ -1,3 +1,6 @@
+// Controlador para envio de e-mails utilizando o Nodemailer.
+// Inclui funcionalidade para redefinição de senha.
+
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({

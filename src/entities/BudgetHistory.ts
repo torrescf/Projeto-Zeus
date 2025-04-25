@@ -1,3 +1,6 @@
+// Entidade que registra o histórico de alterações em orçamentos.
+// Inclui informações sobre ações realizadas e dados anteriores.
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from "typeorm";
 import { Budget } from "./Budget";
 import { Member } from "./Member";
