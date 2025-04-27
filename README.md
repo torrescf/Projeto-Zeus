@@ -7,7 +7,7 @@ Veja abaixo uma demonstração da interface visual da API:
 
 ## 📚 Descrição do produto
 
-O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, clientes, projetos, orçamentos e penalidades. Ele oferece uma API robusta e escalável, construída com **Node.js** e **TypeScript**, utilizando **PostgreSQL** como banco de dados. O sistema conta com autenticação JWT, integração com serviços de e-mail e suporte a múltiplos papéis de usuário, como administradores, membros e estagiários.
+O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, clientes, projetos, orçamentos, penalidades e equipamentos. Ele oferece uma API robusta e escalável, construída com **Node.js** e **TypeScript**, utilizando **PostgreSQL** como banco de dados. O sistema conta com autenticação JWT, integração com serviços de e-mail, suporte a múltiplos papéis de usuário (administradores, membros e estagiários) e funcionalidades como check-in/check-out de equipamentos e histórico de alterações em orçamentos.
 
 ## 💻 Tecnologias utilizadas
 
@@ -94,8 +94,9 @@ EMAIL_PASS= sua senha
 │   ├── middlewares/          # Middlewares de autenticação e validação
 │   ├── routes/               # Definição das rotas da API
 │   ├── services/             # Lógica de negócio
+│   ├── tests/                # Testes automatizados
 │   ├── index.ts              # Ponto de entrada da aplicação
-│   └── tests/                # Testes automatizados
+├── public/                   # Arquivos estáticos (ex.: interface visual)
 ├── .env                      # Variáveis de ambiente
 ├── package.json              # Dependências e scripts do projeto
 ├── tsconfig.json             # Configuração do TypeScript
@@ -141,20 +142,28 @@ Optei por utilizar o **PostgreSQL**, um banco de dados relacional, devido às se
 
 ---
 
-### 2. Envio para Aprovação de Orçamentos
-**Endpoint**: `PUT /budget/:id`  
+### 2. Gerenciamento de Penalidades
+**Endpoint**: `POST /penalty`  
 **Exemplo de Requisição**:
 ```json
 {
-  "status": "approved"
+  "type": "warning",
+  "reason": "Atraso no projeto",
+  "date": "2023-10-01",
+  "memberId": 1
 }
 ```
 **Resposta**:
 ```json
 {
   "id": 1,
-  "title": "Website Development",
-  "status": "approved"
+  "type": "warning",
+  "reason": "Atraso no projeto",
+  "date": "2023-10-01",
+  "member": {
+    "id": 1,
+    "name": "John Doe"
+  }
 }
 ```
 
@@ -194,49 +203,39 @@ Optei por utilizar o **PostgreSQL**, um banco de dados relacional, devido às se
 
 ---
 
-### 4. Listagem de Orçamentos Não Enviados
-**Endpoint**: `GET /budget?status=pending`  
-**Resposta**:
-```json
-[
-  {
-    "id": 1,
-    "title": "Website Development",
-    "status": "pending"
-  }
-]
-```
-
-## Exemplos de Fluxos Específicos
-
-### 1. Envio para Aprovação de Orçamentos
-**Endpoint**: `PUT /budget/:id/send-for-approval`  
-**Exemplo de Resposta**:
+### 4. Gerenciamento de Projetos
+**Endpoint**: `POST /project`  
+**Exemplo de Requisição**:
 ```json
 {
-  "message": "Budget sent for approval",
+  "name": "Novo Projeto",
+  "description": "Descrição do projeto",
+  "status": "planning",
+  "leaderId": 1,
+  "budgetId": 1
+}
+```
+**Resposta**:
+```json
+{
+  "id": 1,
+  "name": "Novo Projeto",
+  "description": "Descrição do projeto",
+  "status": "planning",
+  "leader": {
+    "id": 1,
+    "name": "John Doe"
+  },
   "budget": {
     "id": 1,
-    "title": "Website Development",
-    "status": "Em análise"
+    "title": "Orçamento Inicial"
   }
 }
 ```
 
-### 2. Listagem de Orçamentos Não Enviados
-**Endpoint**: `GET /budget/pending`  
-**Exemplo de Resposta**:
-```json
-[
-  {
-    "id": 1,
-    "title": "Website Development",
-    "status": "Em análise"
-  }
-]
-```
+---
 
-### 3. Recuperação de Senha
+### 5. Recuperação de Senha
 **Endpoint**: `POST /auth/reset-password/:token`  
 **Exemplo de Requisição**:
 ```json
