@@ -254,6 +254,7 @@
             <div class="tab active" data-tab="login">Login</div>
             <div class="tab" data-tab="member">Membros</div>
             <div class="tab" data-tab="budget">Orçamentos</div>
+            <div class="tab" data-tab="password">Recuperação de Senha</div>
         </div>
 
         <div class="card-container">
@@ -332,6 +333,41 @@
                 <div class="response-area" id="budgetResponse" style="display: none;">
                     <h3><i class="fas fa-server"></i> Resposta:</h3>
                     <div id="budgetResponseContent"></div>
+                </div>
+            </div>
+
+            <!-- Password Recovery and Reset Form -->
+            <div class="card tab-content" id="password-tab">
+                <h2><i class="fas fa-key"></i> Recuperação de Senha</h2>
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label for="forgotEmail"><i class="fas fa-envelope"></i> Email:</label>
+                        <input type="email" id="forgotEmail" class="form-control" required placeholder="seu@email.com">
+                    </div>
+                    <button type="submit" class="btn btn-warning"><i class="fas fa-paper-plane"></i> Enviar Código</button>
+                </form>
+
+                <div class="response-area" id="forgotPasswordResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="forgotPasswordResponseContent"></div>
+                </div>
+
+                <h2><i class="fas fa-lock"></i> Redefinir Senha</h2>
+                <form id="resetPasswordForm">
+                    <div class="form-group">
+                        <label for="resetToken"><i class="fas fa-key"></i> Código de Redefinição:</label>
+                        <input type="text" id="resetToken" class="form-control" required placeholder="Código recebido por email">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword"><i class="fas fa-lock"></i> Nova Senha:</label>
+                        <input type="password" id="newPassword" class="form-control" required placeholder="Sua nova senha">
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Redefinir Senha</button>
+                </form>
+
+                <div class="response-area" id="resetPasswordResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="resetPasswordResponseContent"></div>
                 </div>
             </div>
         </div>
@@ -493,6 +529,81 @@
                     contentArea.innerHTML = `
                         <p><strong>Status:</strong> Erro</p>
                         <p><strong>Mensagem:</strong> ${data.message || 'Falha ao criar orçamento'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Forgot Password Form Submission
+        document.getElementById("forgotPasswordForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("forgotEmail").value;
+            const responseArea = document.getElementById("forgotPasswordResponse");
+            const contentArea = document.getElementById("forgotPasswordResponseContent");
+
+            try {
+                const response = await fetch(`${API_URL}/auth/forgot-password`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Código enviado para o email informado.'}</p>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao enviar código de redefinição.'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Reset Password Form Submission
+        document.getElementById("resetPasswordForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const token = document.getElementById("resetToken").value;
+            const password = document.getElementById("newPassword").value;
+            const responseArea = document.getElementById("resetPasswordResponse");
+            const contentArea = document.getElementById("resetPasswordResponseContent");
+
+            try {
+                const response = await fetch(`${API_URL}/auth/reset-password/${token}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ password }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Senha redefinida com sucesso!'}</p>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao redefinir senha.'}</p>
                     `;
                 }
                 responseArea.style.display = 'block';
