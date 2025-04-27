@@ -141,4 +141,35 @@ export class BudgetController {
             res.status(500).send(errorMessage);
         }
     }
+
+    async sendForApproval(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const budgetRepository = AppDataSource.getRepository(Budget);
+
+            const budget = await budgetRepository.findOneBy({ id: parseInt(id) });
+            if (!budget) return res.status(404).json({ message: "Budget not found" });
+
+            budget.status = "pending"; // Corrigido para usar um valor válido
+            await budgetRepository.save(budget);
+
+            res.status(200).json({ message: "Budget sent for approval", budget });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    async getPendingBudgets(req: Request, res: Response) {
+        try {
+            const budgetRepository = AppDataSource.getRepository(Budget);
+            const budgets = await budgetRepository.find({
+                where: { status: "pending" }, // Corrigido para usar um valor válido
+            });
+            res.json(budgets);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 }

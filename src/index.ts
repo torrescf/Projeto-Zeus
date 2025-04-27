@@ -7,6 +7,10 @@ import { AppDataSource } from './config/data-source';
 import authRoutes from './routes/auth.routes';
 import budgetRoutes from './routes/budget.routes';
 import memberRoutes from './routes/member.routes';
+import penaltyRoutes from './routes/penalty.routes';
+import equipmentRoutes from './routes/equipment.routes';
+import projectRoutes from './routes/project.routes';
+import clientRoutes from './routes/client.routes';
 
 // Debug inicial
 console.log('[INIT] Iniciando servidor...');
@@ -54,6 +58,10 @@ AppDataSource.initialize()
     app.use('/auth', authRoutes);
     app.use('/budget', budgetRoutes);
     app.use('/member', memberRoutes);
+    app.use('/penalty', penaltyRoutes);
+    app.use('/equipment', equipmentRoutes);
+    app.use('/project', projectRoutes);
+    app.use('/client', clientRoutes);
 
     // Health Check
     app.get('/healthcheck', (req: Request, res: Response) => {

@@ -13,5 +13,7 @@ router.get("/", authMiddleware, budgetController.getAll);
 router.get("/:id", authMiddleware, budgetController.getById);
 router.put("/:id", authMiddleware, budgetController.update);
 router.delete("/:id", authMiddleware, budgetController.delete);
+router.put("/:id/send-for-approval", authMiddleware, budgetController.sendForApproval);
+router.get("/pending", authMiddleware, budgetController.getPendingBudgets);
 
 export default router;

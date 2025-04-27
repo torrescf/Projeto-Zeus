@@ -1,18 +1,26 @@
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Member } from "./Member";
+
 // Entidade que representa equipamentos no sistema.
 // Inclui informações como nome, descrição e datas de criação/atualização.
 
+@Entity()
 export class Equipment {
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
     name: string;
+
+    @Column()
     description: string;
+
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
+
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
     updatedAt: Date;
 
-    constructor(id: string, name: string, description: string, createdAt: Date, updatedAt: Date) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    @ManyToOne(() => Member, { nullable: true })
+    checkedOutBy: Member | null;
 }

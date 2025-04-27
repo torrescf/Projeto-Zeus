@@ -12,7 +12,7 @@ export class MemberController {
         try {
             const member = this.memberRepository.create(req.body);
             await this.memberRepository.save(member);
-            res.status(201).json(member);
+            res.status(201).json({ message: "Member created successfully", member });
         } catch (error: unknown) {
             if (error instanceof Error) {
                 res.status(500).json({ message: error.message });

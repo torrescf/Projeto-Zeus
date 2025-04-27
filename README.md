@@ -97,6 +97,155 @@ EMAIL_PASS= sua senha
 └── README.md                 # Documentação do projeto
 ```
 
+## Justificativa do Banco de Dados
+
+Optei por utilizar o **PostgreSQL**, um banco de dados relacional, devido às seguintes razões:
+
+1. **Consistência e Integridade**: O PostgreSQL oferece suporte robusto a transações ACID, garantindo a consistência dos dados.
+2. **Relacionamentos Complexos**: O sistema requer relacionamentos entre entidades como membros, projetos, clientes e orçamentos, que são bem suportados por bancos relacionais.
+3. **Escalabilidade**: O PostgreSQL é altamente escalável, suportando grandes volumes de dados e consultas complexas.
+4. **Comunidade e Suporte**: Possui uma ampla comunidade e documentação, facilitando a resolução de problemas e a implementação de novas funcionalidades.
+
+## Exemplos de Uso da API
+
+### 1. Cadastro de Membros
+**Endpoint**: `POST /member`  
+**Exemplo de Requisição**:
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@compjunior.com.br",
+  "role": "member",
+  "phone": "123456789",
+  "gender": "male",
+  "skills": ["JavaScript", "TypeScript"]
+}
+```
+**Resposta**:
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john.doe@compjunior.com.br",
+  "role": "member",
+  "phone": "123456789",
+  "gender": "male",
+  "skills": ["JavaScript", "TypeScript"]
+}
+```
+
+---
+
+### 2. Envio para Aprovação de Orçamentos
+**Endpoint**: `PUT /budget/:id`  
+**Exemplo de Requisição**:
+```json
+{
+  "status": "approved"
+}
+```
+**Resposta**:
+```json
+{
+  "id": 1,
+  "title": "Website Development",
+  "status": "approved"
+}
+```
+
+---
+
+### 3. Check-in/Check-out de Equipamentos
+**Check-out**  
+**Endpoint**: `PUT /equipment/:id/check-out`  
+**Exemplo de Requisição**:
+```json
+{
+  "memberId": 1
+}
+```
+**Resposta**:
+```json
+{
+  "id": 1,
+  "name": "Laptop",
+  "checkedOutBy": {
+    "id": 1,
+    "name": "John Doe"
+  }
+}
+```
+
+**Check-in**  
+**Endpoint**: `PUT /equipment/:id/check-in`  
+**Resposta**:
+```json
+{
+  "id": 1,
+  "name": "Laptop",
+  "checkedOutBy": null
+}
+```
+
+---
+
+### 4. Listagem de Orçamentos Não Enviados
+**Endpoint**: `GET /budget?status=pending`  
+**Resposta**:
+```json
+[
+  {
+    "id": 1,
+    "title": "Website Development",
+    "status": "pending"
+  }
+]
+```
+
+## Exemplos de Fluxos Específicos
+
+### 1. Envio para Aprovação de Orçamentos
+**Endpoint**: `PUT /budget/:id/send-for-approval`  
+**Exemplo de Resposta**:
+```json
+{
+  "message": "Budget sent for approval",
+  "budget": {
+    "id": 1,
+    "title": "Website Development",
+    "status": "Em análise"
+  }
+}
+```
+
+### 2. Listagem de Orçamentos Não Enviados
+**Endpoint**: `GET /budget/pending`  
+**Exemplo de Resposta**:
+```json
+[
+  {
+    "id": 1,
+    "title": "Website Development",
+    "status": "Em análise"
+  }
+]
+```
+
+### 3. Recuperação de Senha
+**Endpoint**: `POST /auth/reset-password/:token`  
+**Exemplo de Requisição**:
+```json
+{
+  "password": "newpassword123"
+}
+```
+**Exemplo de Resposta**:
+```json
+{
+  "message": "Password reset successfully"
+}
+```
+
 ## ✍🏻 Autor
 
 | [<img src="https://avatars.githubusercontent.com/u/91806052?v=4" width=115><br><sub>João Pedro Oliveira</sub>](https://github.com/torrescf) |

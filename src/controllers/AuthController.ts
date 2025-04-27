@@ -198,7 +198,7 @@ export class AuthController {
             // Update the password
             member.password = await bcrypt.hash(password, 10);
             member.resetPasswordToken = null as unknown as string; // Corrigido para evitar erro de tipo
-            member.resetPasswordExpires = null as unknown as Date;
+            member.resetPasswordExpires = null as unknown as Date; // Corrigido para evitar erro de tipo
             await this.memberRepository.save(member);
 
             res.status(200).json({ message: "Password reset successfully" });
