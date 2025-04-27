@@ -1,5 +1,10 @@
 # ⚡ Projeto Zeus
 
+## 🎥 Demonstração da Interface Visual
+Veja abaixo uma demonstração da interface visual da API:
+
+![Demonstração da Interface](./public/demo.gif)
+
 ## 📚 Descrição do produto
 
 O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, clientes, projetos, orçamentos e penalidades. Ele oferece uma API robusta e escalável, construída com **Node.js** e **TypeScript**, utilizando **PostgreSQL** como banco de dados. O sistema conta com autenticação JWT, integração com serviços de e-mail e suporte a múltiplos papéis de usuário, como administradores, membros e estagiários.
