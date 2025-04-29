@@ -2,38 +2,46 @@ import request from "supertest";
 import app from "../app";
 import { AppDataSource } from "../config/data-source";
 
-let authToken: string;
-
-beforeAll(async () => {
-  await AppDataSource.initialize();
-  await AppDataSource.synchronize(true);
-
-  // Criar um membro para autenticação
-  await request(app)
-    .post("/auth/register")
-    .send({
-      name: "Client Test",
-      email: "clienttest@compjunior.com.br",
-      password: "password123",
-      role: "admin"
-    });
-
-  // Login para obter token
-  const login = await request(app)
-    .post("/auth/login")
-    .send({
-      email: "clienttest@compjunior.com.br",
-      password: "password123"
-    });
-  
-  authToken = login.body.token;
-});
-
-afterAll(async () => {
-  await AppDataSource.destroy();
-});
-
 describe("Client Controller", () => {
+  let authToken: string;
+
+  beforeAll(async () => {
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+      await AppDataSource.synchronize(true);
+    }
+
+    // Create test admin user
+    await request(app)
+      .post("/auth/register")
+      .send({
+        name: "Test Admin",
+        email: "admin@compjunior.com.br",
+        password: "adminPassword123",
+        role: "admin",
+      });
+
+    // Login to get token
+    const loginResponse = await request(app)
+      .post("/auth/login")
+      .send({
+        email: "admin@compjunior.com.br",
+        password: "adminPassword123",
+      });
+
+    authToken = loginResponse.body.token;
+  });
+
+  beforeEach(async () => {
+    await AppDataSource.synchronize(true); // Reset database state
+  });
+
+  afterAll(async () => {
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
+    }
+  });
+
   it("should create a client with valid data", async () => {
     const response = await request(app)
       .post("/client")
@@ -41,7 +49,7 @@ describe("Client Controller", () => {
       .send({
         name: "Test Client",
         email: "client@example.com",
-        phone: "123456789"
+        phone: "123456789",
       });
 
     expect(response.status).toBe(201);
@@ -49,17 +57,17 @@ describe("Client Controller", () => {
   });
 
   it("should get client with budgets", async () => {
-    // Primeiro cria um cliente
-    const client = await request(app)
+    // Create client
+    const clientResponse = await request(app)
       .post("/client")
       .set("Authorization", `Bearer ${authToken}`)
       .send({
-        name: "Client With Budgets",
+        name: "Client With Budget",
         email: "client2@example.com",
-        phone: "987654321"
+        phone: "987654321",
       });
 
-    // Cria um orçamento para o cliente
+    // Create budget for client
     await request(app)
       .post("/budget")
       .set("Authorization", `Bearer ${authToken}`)
@@ -67,12 +75,12 @@ describe("Client Controller", () => {
         title: "Client Budget",
         description: "Description",
         amount: 500,
-        clientId: client.body.id
+        clientId: clientResponse.body.id,
       });
 
-    // Busca o cliente com orçamentos
+    // Get client with budgets
     const response = await request(app)
-      .get(`/client/${client.body.id}`)
+      .get(`/client/${clientResponse.body.id}`)
       .set("Authorization", `Bearer ${authToken}`);
 
     expect(response.status).toBe(200);
