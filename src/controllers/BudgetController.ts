@@ -1,12 +1,12 @@
 // Controlador responsável por gerenciar orçamentos.
 // Inclui métodos para criação, listagem, atualização e exclusão.
 
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { AppDataSource } from "../config/data-source";
 import { Budget } from "../entities/Budget";
 import { Member } from "../entities/Member";
 import { Client } from "../entities/Client";
-import { sendBudgetStatusEmail, sendBudgetStatusNotification } from "../services/emailService";
+import { sendBudgetStatusNotification } from "../services/emailService";
 import { BudgetService } from "../services/budgetService";
 
 export class BudgetController {

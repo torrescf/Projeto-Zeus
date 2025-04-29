@@ -2,10 +2,14 @@ import request from "supertest";
 import app from "../app";
 import { AppDataSource } from "../config/data-source";
 import * as emailService from "../services/emailService";
+import crypto from "crypto";
+import { Member } from "../entities/Member";
+import { MoreThan } from "typeorm";
 
 jest.mock("../services/emailService");
 
 let resetToken: string;
+const memberRepository = AppDataSource.getRepository(Member);
 
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
@@ -134,6 +138,34 @@ describe("Auth Controller", () => {
     });
 
     it("should reset password with valid token", async () => {
+      // First, initiate password recovery to generate a token
+      const forgotResponse = await request(app)
+        .post("/auth/forgot-password")
+        .send({ email: "password@compjunior.com.br" });
+
+      // Get the raw token from the response
+      resetToken = forgotResponse.body.resetToken;
+
+      // Hash the token the same way the controller does
+      const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+      // Add a small delay to ensure database commit
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Verify the token is stored in the database
+      const member = await memberRepository.findOne({
+        where: {
+          email: "password@compjunior.com.br",
+          resetPasswordToken: hashedToken,
+          resetPasswordExpires: MoreThan(new Date()),
+        },
+      });
+
+      if (!member) {
+        console.error("Member not found with token:", hashedToken);
+      }
+
+      // Attempt password reset
       const response = await request(app)
         .post(`/auth/reset-password/${resetToken}`)
         .send({ password: "newPassword123" });

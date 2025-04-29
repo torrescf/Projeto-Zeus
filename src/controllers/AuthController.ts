@@ -8,7 +8,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { MoreThan } from "typeorm";
-import * as emailService from "../services/emailService";
 
 const memberRepository = AppDataSource.getRepository(Member);
 
@@ -172,11 +171,14 @@ export class AuthController {
             const { token } = req.params;
             const { password } = req.body;
 
+            console.log("Reset password request received for token:", token);
+
             if (!password) {
                 return res.status(400).json({ message: "Password is required" });
             }
 
             const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
+            console.log("Hashed token:", resetTokenHash);
 
             const member = await memberRepository.findOne({
                 where: {
@@ -186,14 +188,31 @@ export class AuthController {
             });
 
             if (!member) {
+                console.error("No member found for token or token expired");
+                const expiredMember = await memberRepository.findOne({
+                    where: { resetPasswordToken: resetTokenHash },
+                });
+                if (expiredMember) {
+                    console.error("Token exists but expired at:", expiredMember.resetPasswordExpires);
+                }
                 return res.status(400).json({ message: "Token inválido ou expirado" });
             }
 
+            console.log("Member found for token:", member.id);
+
+            // Ensure the password meets security requirements
+            if (password.length < 8) {
+                console.error("[AUTH] Senha muito curta");
+                return res.status(400).json({ message: "A senha deve ter pelo menos 8 caracteres" });
+            }
+
+            // Hash the new password and reset token fields
             member.password = await bcrypt.hash(password, 10);
             member.resetPasswordToken = null as unknown as string; // Explicitly cast to match type
             member.resetPasswordExpires = null as unknown as Date; // Explicitly cast to match type
             await memberRepository.save(member);
 
+            console.log("[AUTH] Senha redefinida com sucesso para o usuário:", member.id);
             res.status(200).json({ message: "Senha redefinida com sucesso" });
         } catch (error) {
             console.error("[AUTH] Erro durante a redefinição de senha:", error);
