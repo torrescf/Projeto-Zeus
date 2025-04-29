@@ -1,22 +1,18 @@
 import 'reflect-metadata';
+import express, { Request, Response, NextFunction } from 'express';
 import app from './app';
 import { AppDataSource } from './config/data-source';
-<<<<<<< Updated upstream
 import authRoutes from './routes/auth.routes';
 import budgetRoutes from './routes/budget.routes';
 import memberRoutes from './routes/member.routes';
-=======
->>>>>>> Stashed changes
 
 const PORT = process.env.PORT || 4001;
 
 AppDataSource.initialize()
   .then(() => {
     console.log('[DB] Data Source inicializado com sucesso');
-<<<<<<< Updated upstream
-    
-    app = express();
-    const port = process.env.PORT || 4001; // Alterar para uma porta diferente
+
+    const app = express(); // Initialize Express app
 
     // ======================
     // Middlewares (ORDEM É CRÍTICA)
@@ -43,8 +39,8 @@ AppDataSource.initialize()
         endpoints: {
           auth: '/auth',
           budget: '/budget',
-          member: '/member'
-        }
+          member: '/member',
+        },
       });
     });
 
@@ -55,9 +51,9 @@ AppDataSource.initialize()
 
     // Health Check
     app.get('/healthcheck', (req: Request, res: Response) => {
-      res.status(200).json({ 
+      res.status(200).json({
         status: 'OK',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -74,15 +70,15 @@ AppDataSource.initialize()
       console.error('[ERROR]', err.stack);
       res.status(500).json({
         error: 'Erro interno do servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : undefined
+        message: process.env.NODE_ENV === 'development' ? err.message : undefined,
       });
     });
 
     // ======================
     // Inicialização
     // ======================
-    app.listen(port, () => {
-      console.log(`🚀 Servidor rodando em http://localhost:${port}`);
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
       console.log('Rotas disponíveis:');
       console.log(`- POST   /auth/register`);
       console.log(`- POST   /auth/login`);
@@ -90,10 +86,6 @@ AppDataSource.initialize()
       console.log(`- POST   /budget/`);
       console.log(`- GET    /member/`);
       console.log(`- POST   /member/`);
-=======
-    app.listen(PORT, () => {
-      console.log(`[SERVER] Servidor rodando na porta ${PORT}`);
->>>>>>> Stashed changes
     });
   })
   .catch((error) => {

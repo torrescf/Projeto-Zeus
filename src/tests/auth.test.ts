@@ -129,15 +129,11 @@ describe("Auth Controller", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.message).toContain("Email de redefinição de senha enviado");
-      expect(resetToken).toBeTruthy(); // Verify token is captured
+      expect(response.body.resetToken).toBeTruthy(); // Verify token is captured
+      resetToken = response.body.resetToken; // Save token for reset test
     });
 
     it("should reset password with valid token", async () => {
-      // First get a valid token
-      await request(app)
-        .post("/auth/forgot-password")
-        .send({ email: "password@compjunior.com.br" });
-
       const response = await request(app)
         .post(`/auth/reset-password/${resetToken}`)
         .send({ password: "newPassword123" });
@@ -156,16 +152,14 @@ describe("Auth Controller", () => {
     });
 
     it("should handle email sending errors gracefully", async () => {
-      jest.spyOn(emailService, "sendPasswordResetEmail").mockImplementationOnce(() => {
-        throw new Error("Email service error");
-      });
-
+      process.env.SIMULATE_EMAIL_ERROR = "true"; // Simulate email error
       const response = await request(app)
         .post("/auth/forgot-password")
         .send({ email: "password@compjunior.com.br" });
 
       expect(response.status).toBe(500);
       expect(response.body.message).toContain("Erro ao enviar email");
+      process.env.SIMULATE_EMAIL_ERROR = "false"; // Reset simulation
     });
   });
 });
