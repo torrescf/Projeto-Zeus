@@ -5,7 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
@@ -13,13 +13,13 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuração das rotas da API
-app.post('/auth/login', (req, res) => {
+app.post('/api/auth/login', (req, res) => {
     const { email, password } = req.body;
     
     // Simulação de autenticação (substitua pela sua lógica real)
-    if (email === 'admin@example.com' && password === '123456') {
+    if (email === 'admin@example.com' && password === 'password') {
         res.json({
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFkbWluIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+            token: 'example-token',
             user: { id: 1, name: 'Admin', email: 'admin@example.com', role: 'admin' }
         });
     } else {
@@ -27,7 +27,7 @@ app.post('/auth/login', (req, res) => {
     }
 });
 
-app.post('/member', (req, res) => {
+app.post('/api/member', (req, res) => {
     const token = req.headers.authorization?.split(' ')[1];
     const { name, email, role } = req.body;
     
@@ -38,12 +38,12 @@ app.post('/member', (req, res) => {
     
     // Simulação de criação de membro
     res.json({
-        message: 'Membro criado com sucesso',
+        message: 'Membro registrado com sucesso!',
         member: { id: Math.floor(Math.random() * 1000), name, email, role }
     });
 });
 
-app.post('/budget', (req, res) => {
+app.post('/api/budget', (req, res) => {
     const token = req.headers.authorization?.split(' ')[1];
     const { title, description, amount, clientId } = req.body;
     
@@ -53,7 +53,7 @@ app.post('/budget', (req, res) => {
     
     // Simulação de criação de orçamento
     res.json({
-        message: 'Orçamento criado com sucesso',
+        message: 'Orçamento criado com sucesso!',
         budget: { 
             id: Math.floor(Math.random() * 1000), 
             title, 
@@ -66,35 +66,34 @@ app.post('/budget', (req, res) => {
     });
 });
 
-app.post('/auth/forgot-password', (req, res) => {
+app.post('/api/auth/forgot-password', (req, res) => {
     const { email } = req.body;
     
     // Simulação de envio de código
     res.json({
-        message: `Código de redefinição enviado para ${email}`,
+        message: `Código enviado para o email ${email}`,
         resetToken: 'RESET_' + Math.random().toString(36).substring(2, 15)
     });
 });
 
-app.post('/auth/reset-password/:token', (req, res) => {
+app.post('/api/auth/reset-password/:token', (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
     
     // Simulação de redefinição de senha
     if (token && password) {
-        res.json({ message: 'Senha redefinida com sucesso' });
+        res.json({ message: 'Senha redefinida com sucesso!' });
     } else {
         res.status(400).json({ message: 'Token inválido ou senha não fornecida' });
     }
 });
 
 // Rota para servir o arquivo HTML
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Iniciar o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-    console.log(`Acesse: http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
