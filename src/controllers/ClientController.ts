@@ -25,17 +25,17 @@ export class ClientController {
         try {
             const client = await clientRepository.findOne({
                 where: { id: parseInt(req.params.id) },
-                relations: ['budgets'], // Ensure budgets relation exists
+                relations: ["budgets"], // Explicitly load the budgets relation
             });
 
             if (!client) {
-                return res.status(404).json({ message: 'Client not found' });
+                return res.status(404).json({ message: "Client not found" });
             }
 
             res.status(200).json(client);
         } catch (error) {
-            console.error('[CLIENT] Error fetching client:', error);
-            res.status(500).json({ message: 'Error fetching client' });
+            console.error("Error fetching client:", error);
+            res.status(500).json({ message: "Error fetching client" });
         }
     }
 

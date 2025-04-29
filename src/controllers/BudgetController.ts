@@ -29,21 +29,24 @@ export class BudgetController {
                 return res.status(404).json({ message: "Client not found" });
             }
 
+            console.log("Creating budget with data:", { title, description, amount, clientId });
+
             const budget = budgetRepository.create({
                 title,
                 description,
                 amount,
-                status: 'pending',
-                createdBy: member,
-                client,
+                client, // Associate the client
+                createdBy: req.user, // Ensure the user is set as the creator
             });
 
             await budgetRepository.save(budget);
+
+            console.log("Created budget:", budget);
+
             res.status(201).json(budget);
         } catch (error) {
-            console.error(error);
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            res.status(500).json({ message: errorMessage });
+            console.error("[BUDGET] Error creating budget:", error);
+            res.status(500).json({ message: "Error creating budget" });
         }
     }
 
