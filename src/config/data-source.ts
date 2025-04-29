@@ -32,3 +32,25 @@ export const AppDataSource = new DataSource({
     migrations: ["src/migrations/*.ts"], // Caminho corrigido
     subscribers: [],
 });
+
+export const initializeDatabase = async () => {
+    try {
+        if (!AppDataSource.isInitialized) {
+            await AppDataSource.initialize();
+            console.log("[DB] Data Source inicializado com sucesso");
+        } else {
+            console.log("[DB] Data Source já inicializado");
+        }
+        return AppDataSource;
+    } catch (error) {
+        console.error("[DB] Error initializing Data Source:", error);
+        throw error;
+    }
+};
+
+export const closeDatabase = async () => {
+    if (AppDataSource.isInitialized) {
+        await AppDataSource.destroy();
+        console.log("[DB] Data Source encerrado com sucesso");
+    }
+};

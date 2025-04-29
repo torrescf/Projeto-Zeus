@@ -21,8 +21,8 @@ services:
     container_name: zeus_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: zeus
+      POSTGRES_PASSWORD: 147afj
+      POSTGRES_DB: zeus_admin
     ports:
       - "5432:5432"
     volumes:
@@ -50,31 +50,18 @@ services:
       DB_NAME: zeus_admin
       BODY_PARSER_LIMIT: 50mb
       PORT: 3000
-      JWT_SECRET: "sua_chave_secreta_forte_aqui"
+      JWT_SECRET: your_jwt_secret_key
       NODE_ENV: production
       DB_SYNC: "false" # Desativar sincronização automática em produção
     ports:
       - "3000:3000"  # Mapeamento direto da porta
     volumes:
-      - .:/app
-      - /app/node_modules
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     working_dir: /app
-    command: sh -c "npm run dev"  # Removido o wait-for-it
+    command: sh -c "while ! pg_isready -h db -U postgres; do sleep 1; done && npm run dev"
     networks:
       - default
-
-  app:
-    build:
-      context: .
-    ports:
-      - "4001:4001"
-    environment:
-      - PORT=4001
-    depends_on:
-      - db
-    volumes:
-      - .:/usr/src/app
-    command: npm start
 
 networks:
   default:

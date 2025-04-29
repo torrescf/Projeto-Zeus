@@ -47,3 +47,5 @@ Zeus_Insomnia.json
 
 # Log files
 logfile
+
+jest.config.js
