@@ -78,10 +78,15 @@ describe("Client Controller", () => {
         clientId: clientResponse.body.id,
       });
 
+    // Add small delay to ensure all operations complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     // Get client with budgets
     const response = await request(app)
       .get(`/client/${clientResponse.body.id}`)
       .set("Authorization", `Bearer ${authToken}`);
+
+    console.log("Client with budgets:", response.body); // Debug log
 
     expect(response.status).toBe(200);
     expect(response.body.budgets).toBeDefined();
