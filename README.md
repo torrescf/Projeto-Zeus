@@ -3,6 +3,9 @@
 ## 📚 Descrição do produto
 
 O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, clientes, projetos, orçamentos e penalidades. Ele oferece uma API robusta e escalável, construída com **Node.js** e **TypeScript**, utilizando **PostgreSQL** como banco de dados. O sistema conta com autenticação JWT, integração com serviços de e-mail e suporte a múltiplos papéis de usuário, como administradores, membros e estagiários.
+O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, clientes, projetos, orçamentos e penalidades. Ele oferece uma API robusta e escalável, construída com **Node.js** e **TypeScript**, utilizando **PostgreSQL** como banco de dados. O sistema conta com autenticação JWT, integração com serviços de e-mail e suporte a múltiplos papéis de usuário, como administradores e membros.
+
+---
 
 ## 💻 Tecnologias utilizadas
 
@@ -16,6 +19,8 @@ O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, client
 - **Jest** 29.6 (para testes)
 - **Insomnia** (para testes manuais de API)
 
+---
+
 ## 🧑‍💻 Regras de código adotadas
 
 - Uso do padrão **camelCase** para variáveis e funções.
@@ -24,6 +29,8 @@ O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, client
 - Comentários explicativos obrigatórios para cada função.
 - Aplicação do princípio **DRY** (Don't Repeat Yourself).
 - Tratamento de erros padronizado em toda a aplicação.
+
+---
 
 ## 🧑‍💻 Regras e padrões de Git adotadas
 
@@ -42,6 +49,8 @@ O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, client
 - Após concluir as alterações, deve ser criado um Pull Request para a branch `back`.
 - A cada 2 dias, a branch `back` deve ser mergeada na `main`, garantindo que o código esteja funcional e consistente.
 
+---
+
 ## 🧑‍💻 Como rodar o projeto
 
 1. Clone o repositório:
@@ -49,35 +58,42 @@ O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, client
    git clone https://github.com/torrescf/Projeto-Zeus.git
    cd Projeto-Zeus
    ```
+
 2. Instale as dependências:
    ```bash
    npm install
    ```
-3. Configure o arquivo `.env` com as variáveis de ambiente necessárias.
+
+3. Configure o arquivo `.env` com as variáveis de ambiente necessárias:
+   ```env
+   DB_HOST=host_do_banco
+   DB_PORT=porta_do_banco
+   DB_USER=usuario_do_banco
+   DB_PASSWORD=senha_do_banco
+   DB_NAME=nome_do_banco
+   JWT_SECRET=sua_chave_secreta
+   EMAIL_USER=seu_email
+   EMAIL_PASS=sua_senha
+   ```
+
 4. Inicie o banco de dados PostgreSQL e rode as migrations:
    ```bash
    npm run migration:run
    ```
+
 5. Inicie o servidor em modo de desenvolvimento:
    ```bash
    npm run dev
    ```
-6. Teste os endpoints utilizando o Insomnia ou outro cliente REST.
 
-## 🔐 Arquivo .env
+6. Acesse a interface web em:
+   ```
+   http://localhost:5000
+   ```
 
-As seguintes variáveis de ambiente são necessárias para o funcionamento do sistema:
+7. Teste os endpoints utilizando o Insomnia ou outro cliente REST.
 
-```env
-DB_HOST= host do seu banco de dados
-DB_PORT= porta do seu banco de dados 
-DB_USER= Seu usuário do banco de dados
-DB_PASSWORD= Sua senha do banco de dados
-DB_NAME= nome do banco de dados
-JWT_SECRET= sua chave secreta
-EMAIL_USER= seu email
-EMAIL_PASS= sua senha
-```
+---
 
 ## 📁 Estrutura de pastas
 
@@ -91,11 +107,14 @@ EMAIL_PASS= sua senha
 │   ├── services/             # Lógica de negócio
 │   ├── index.ts              # Ponto de entrada da aplicação
 │   └── tests/                # Testes automatizados
+├── public/                   # Arquivos estáticos (HTML, CSS, JS)
 ├── .env                      # Variáveis de ambiente
 ├── package.json              # Dependências e scripts do projeto
 ├── tsconfig.json             # Configuração do TypeScript
 └── README.md                 # Documentação do projeto
 ```
+
+---
 
 ## ✍🏻 Autor
 
