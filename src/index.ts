@@ -1,21 +1,19 @@
-// Ponto de entrada principal da aplicação.
-// Configura o servidor Express, middlewares e rotas.
-
 import 'reflect-metadata';
-import express, { Application, Request, Response, NextFunction } from 'express';
+import app from './app';
 import { AppDataSource } from './config/data-source';
+<<<<<<< Updated upstream
 import authRoutes from './routes/auth.routes';
 import budgetRoutes from './routes/budget.routes';
 import memberRoutes from './routes/member.routes';
+=======
+>>>>>>> Stashed changes
 
-// Debug inicial
-console.log('[INIT] Iniciando servidor...');
-
-let app: Application;
+const PORT = process.env.PORT || 4001;
 
 AppDataSource.initialize()
   .then(() => {
     console.log('[DB] Data Source inicializado com sucesso');
+<<<<<<< Updated upstream
     
     app = express();
     const port = process.env.PORT || 4001; // Alterar para uma porta diferente
@@ -92,11 +90,13 @@ AppDataSource.initialize()
       console.log(`- POST   /budget/`);
       console.log(`- GET    /member/`);
       console.log(`- POST   /member/`);
+=======
+    app.listen(PORT, () => {
+      console.log(`[SERVER] Servidor rodando na porta ${PORT}`);
+>>>>>>> Stashed changes
     });
   })
   .catch((error) => {
     console.error('[FATAL] Falha na inicialização:', error);
     process.exit(1);
   });
-
-export { app };
