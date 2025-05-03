@@ -1,5 +1,4 @@
-version: '3.8'
-
+# Removed the obsolete 'version' attribute
 services:
   pgadmin:
     image: dpage/pgadmin4
@@ -59,7 +58,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     working_dir: /app
-    command: sh -c "while ! pg_isready -h db -U postgres; do sleep 1; done && npm run dev"
+    command: sh -c "while ! pg_isready -h db -U postgres; do sleep 1; done && node dist/index.js"
     networks:
       - default
 

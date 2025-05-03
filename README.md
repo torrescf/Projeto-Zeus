@@ -95,6 +95,40 @@ O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, client
 
 ---
 
+## 🧑‍💻 Como rodar o projeto em produção
+
+1. Configure as variáveis de ambiente no arquivo `.env`:
+   ```env
+   DB_HOST=host_do_banco
+   DB_PORT=porta_do_banco
+   DB_USER=usuario_do_banco
+   DB_PASSWORD=senha_do_banco
+   DB_NAME=nome_do_banco
+   JWT_SECRET=sua_chave_secreta
+   SENTRY_DSN=seu_dsn_sentry
+   LOGGLY_TOKEN=seu_token_loggly
+   LOGGLY_SUBDOMAIN=seu_subdominio_loggly
+   ALLOWED_ORIGINS=http://seu-dominio.com
+   ```
+
+2. Construa e inicie os contêineres com Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. Acesse a API em:
+   ```
+   http://localhost:3000
+   ```
+
+4. Monitore logs e erros:
+   - **Sentry**: Acesse o painel do Sentry para rastrear erros.
+   - **Loggly**: Verifique os logs no painel do Loggly.
+
+5. Teste endpoints com ferramentas como Insomnia ou Postman.
+
+---
+
 ## 📁 Estrutura de pastas
 
 ```

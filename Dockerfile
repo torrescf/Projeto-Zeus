@@ -1,22 +1,22 @@
-FROM node:18-alpine AS base
+# Stage 1: Build
+FROM node:16-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
 
+# Stage 2: Production
+FROM node:16-alpine
+WORKDIR /app
 RUN apk add --no-cache postgresql-client
 
-WORKDIR /app
+# Copy production node_modules from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
 
-# Instalar dependências
+# Copy only production-necessary files
+COPY package*.json ./
 
-COPY package.json package-lock.json ./
-RUN npm install
-
-# Copiar código
-COPY . .
-
-# Build para produção
-FROM base AS production
-RUN npm run build
+EXPOSE 3000
 CMD ["node", "dist/index.js"]
-
-# Desenvolvimento
-FROM base AS development
-CMD ["sh", "-c", "while ! pg_isready -h db -U postgres; do sleep 1; done && npm run dev"]
