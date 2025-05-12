@@ -47,3 +47,8 @@ Zeus_Insomnia.json
 
 # Log files
 logfile
+index.js.map
+app.js.map
+coverage/
+logs/
+start-api.ps1

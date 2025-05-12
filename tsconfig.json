@@ -16,17 +16,15 @@
       "@entities/*": ["entities/*"],
       "@controllers/*": ["controllers/*"],
       "@routes/*": ["routes/*"],
-      "@middlewares/*": ["middlewares/*"]
+      "@middlewares/*": ["middlewares/*"],
+      "@app/*": ["app/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "types": [
-      "node",
-      "jest"
-    ]
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/database/entities"],
   "exclude": ["node_modules", "dist"]
 }

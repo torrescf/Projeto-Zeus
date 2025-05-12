@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeus API Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .card h2 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .response-area {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .response-area h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .token-display {
+            word-break: break-all;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            background-color: var(--dark-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: -1px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background-color: #e9ecef;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            cursor: pointer;
+            margin-right: 5px;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-bolt"></i> Zeus API Interface</h1>
+            <p>Gerencie membros, orçamentos e autenticação</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="login">Login</div>
+            <div class="tab" data-tab="member">Membros</div>
+            <div class="tab" data-tab="budget">Orçamentos</div>
+            <div class="tab" data-tab="password">Recuperação de Senha</div>
+        </div>
+
+        <div class="card-container">
+            <!-- Login Form -->
+            <div class="card tab-content active" id="login-tab">
+                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email:</label>
+                        <input type="email" id="email" class="form-control" required placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> Senha:</label>
+                        <input type="password" id="password" class="form-control" required placeholder="Sua senha">
+                    </div>
+                    <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                </form>
+
+                <div class="response-area" id="loginResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="loginResponseContent"></div>
+                </div>
+            </div>
+
+            <!-- Member Registration Form -->
+            <div class="card tab-content" id="member-tab">
+                <h2><i class="fas fa-user-plus"></i> Registrar Membro</h2>
+                <form id="memberForm">
+                    <div class="form-group">
+                        <label for="memberName"><i class="fas fa-user"></i> Nome:</label>
+                        <input type="text" id="memberName" class="form-control" required placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="memberEmail"><i class="fas fa-envelope"></i> Email:</label>
+                        <input type="email" id="memberEmail" class="form-control" required placeholder="membro@empresa.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="memberRole"><i class="fas fa-user-tag"></i> Função:</label>
+                        <select id="memberRole" class="form-control">
+                            <option value="admin">Administrador</option>
+                            <option value="member">Membro</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Registrar Membro</button>
+                </form>
+
+                <div class="response-area" id="memberResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="memberResponseContent"></div>
+                </div>
+            </div>
+
+            <!-- Budget Creation Form -->
+            <div class="card tab-content" id="budget-tab">
+                <h2><i class="fas fa-file-invoice-dollar"></i> Criar Orçamento</h2>
+                <form id="budgetForm">
+                    <div class="form-group">
+                        <label for="budgetTitle"><i class="fas fa-heading"></i> Título:</label>
+                        <input type="text" id="budgetTitle" class="form-control" required placeholder="Título do orçamento">
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetDescription"><i class="fas fa-align-left"></i> Descrição:</label>
+                        <input type="text" id="budgetDescription" class="form-control" required placeholder="Descrição detalhada">
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetAmount"><i class="fas fa-money-bill-wave"></i> Valor:</label>
+                        <input type="number" id="budgetAmount" class="form-control" required placeholder="1000.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="budgetClientId"><i class="fas fa-id-card"></i> ID do Cliente:</label>
+                        <input type="number" id="budgetClientId" class="form-control" required placeholder="123">
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-plus-circle"></i> Criar Orçamento</button>
+                </form>
+
+                <div class="response-area" id="budgetResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="budgetResponseContent"></div>
+                </div>
+            </div>
+
+            <!-- Password Recovery and Reset Form -->
+            <div class="card tab-content" id="password-tab">
+                <h2><i class="fas fa-key"></i> Recuperação de Senha</h2>
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label for="forgotEmail"><i class="fas fa-envelope"></i> Email:</label>
+                        <input type="email" id="forgotEmail" class="form-control" required placeholder="seu@email.com">
+                    </div>
+                    <button type="submit" class="btn btn-warning"><i class="fas fa-paper-plane"></i> Enviar Código</button>
+                </form>
+
+                <div class="response-area" id="forgotPasswordResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="forgotPasswordResponseContent"></div>
+                </div>
+
+                <h2><i class="fas fa-lock"></i> Redefinir Senha</h2>
+                <form id="resetPasswordForm">
+                    <div class="form-group">
+                        <label for="resetToken"><i class="fas fa-key"></i> Código de Redefinição:</label>
+                        <input type="text" id="resetToken" class="form-control" required placeholder="Código recebido por email">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword"><i class="fas fa-lock"></i> Nova Senha:</label>
+                        <input type="password" id="newPassword" class="form-control" required placeholder="Sua nova senha">
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Redefinir Senha</button>
+                </form>
+
+                <div class="response-area" id="resetPasswordResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="resetPasswordResponseContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zeus API Interface &copy; 2023 - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = "http://localhost:4001"; // Certifique-se de que esta URL aponte para o servidor correto
+
+        function setLoading(form, isLoading) {
+            const button = form.querySelector('button[type="submit"]');
+            button.disabled = isLoading;
+            button.innerHTML = isLoading 
+                ? '<i class="fas fa-spinner fa-spin"></i> Processando...' 
+                : button.dataset.originalText;
+        }
+
+        // API Base URL
+        // Removed duplicate declaration of API_URL
+        let authToken = null;
+
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+
+        // Login Form Submission
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const responseArea = document.getElementById("loginResponse");
+            const contentArea = document.getElementById("loginResponseContent");
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await response.json();
+                
+                if (data.token) {
+                    authToken = data.token;
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Token:</strong></p>
+                        <div class="token-display">${data.token}</div>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Credenciais inválidas'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Member Registration Form Submission
+        document.getElementById("memberForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const name = document.getElementById("memberName").value;
+            const email = document.getElementById("memberEmail").value;
+            const role = document.getElementById("memberRole").value;
+            const responseArea = document.getElementById("memberResponse");
+            const contentArea = document.getElementById("memberResponseContent");
+
+            if (!authToken) {
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Você precisa fazer login primeiro</p>
+                `;
+                responseArea.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/member`, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ name, email, role }),
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Membro registrado com sucesso!'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao registrar membro'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Budget Creation Form Submission
+        document.getElementById("budgetForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const title = document.getElementById("budgetTitle").value;
+            const description = document.getElementById("budgetDescription").value;
+            const amount = document.getElementById("budgetAmount").value;
+            const clientId = document.getElementById("budgetClientId").value;
+            const responseArea = document.getElementById("budgetResponse");
+            const contentArea = document.getElementById("budgetResponseContent");
+
+            if (!authToken) {
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Você precisa fazer login primeiro</p>
+                `;
+                responseArea.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/budget`, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ title, description, amount, clientId }),
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Orçamento criado com sucesso!'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao criar orçamento'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Forgot Password Form Submission
+        document.getElementById("forgotPasswordForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("forgotEmail").value;
+            const responseArea = document.getElementById("forgotPasswordResponse");
+            const contentArea = document.getElementById("forgotPasswordResponseContent");
+
+            try {
+                const response = await fetch(`${API_URL}/auth/forgot-password`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Código enviado para o email informado.'}</p>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao enviar código de redefinição.'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Reset Password Form Submission
+        document.getElementById("resetPasswordForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const token = document.getElementById("resetToken").value;
+            const password = document.getElementById("newPassword").value;
+            const responseArea = document.getElementById("resetPasswordResponse");
+            const contentArea = document.getElementById("resetPasswordResponseContent");
+
+            try {
+                const response = await fetch(`${API_URL}/auth/reset-password/${token}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ password }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Senha redefinida com sucesso!'}</p>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao redefinir senha.'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

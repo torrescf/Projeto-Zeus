@@ -1,25 +1,93 @@
-# ⚡ Projeto Zeus
+# Projeto Zeus
 
 ## 🎥 Demonstração da Interface Visual
 Veja abaixo uma demonstração da interface visual da API:
 
 ![Demonstração da Interface](./public/demo.gif)
 
-## 📚 Descrição do produto
+## Descrição
+Projeto Zeus é um sistema interno desenvolvido para a Comp Júnior, utilizando Node.js, TypeScript, PostgreSQL e TypeORM. Ele oferece funcionalidades para gerenciar membros, orçamentos e autenticação de usuários.
 
-O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, clientes, projetos, orçamentos, penalidades e equipamentos. Ele oferece uma API robusta e escalável, construída com **Node.js** e **TypeScript**, utilizando **PostgreSQL** como banco de dados. O sistema conta com autenticação JWT, integração com serviços de e-mail, suporte a múltiplos papéis de usuário (administradores, membros e estagiários) e funcionalidades como check-in/check-out de equipamentos e histórico de alterações em orçamentos.
+## Stack Tecnológica
+- **Node.js**: Plataforma de execução JavaScript.
+- **TypeScript**: Superset de JavaScript com tipagem estática.
+- **PostgreSQL**: Banco de dados relacional.
+- **TypeORM**: ORM para manipulação de banco de dados.
+- **Express**: Framework web para Node.js.
+- **Bibliotecas Adicionais**:
+  - `bcrypt`: Hash de senhas.
+  - `jsonwebtoken`: Geração e validação de tokens JWT.
+  - `express-validator`: Validação de dados.
+  - `multer`: Upload de arquivos.
 
-## 💻 Tecnologias utilizadas
+## Funcionalidades
+1. **Autenticação**:
+   - Login com validação de credenciais e geração de JWT.
+   - Recuperação e redefinição de senha.
+   - Limitação de tentativas de login para evitar ataques de força bruta.
 
-- **Node.js** 18
-- **TypeScript** 5.2
-- **Express** 4.18
-- **TypeORM** 0.3
-- **PostgreSQL** 14
-- **Nodemailer** 6.10
-- **Docker** 3.8
-- **Jest** 29.6 (para testes)
-- **Insomnia** (para testes manuais de API)
+2. **Gerenciamento de Membros**:
+   - CRUD completo para membros.
+   - Upload de fotos.
+   - Validação de dados, como email institucional e datas.
+
+3. **Gerenciamento de Orçamentos**:
+   - CRUD completo para orçamentos.
+   - Alteração de status (em análise, aprovado, reprovado).
+   - Validação de campos obrigatórios.
+
+## Configuração do Ambiente
+### Pré-requisitos
+- Node.js (v16 ou superior)
+- Docker e Docker Compose
+
+### Passos para Configuração
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/projeto-zeus.git
+   cd projeto-zeus
+   ```
+
+2. Configure as variáveis de ambiente no arquivo `.env`:
+   ```env
+   PORT=4001
+   JWT_SECRET=sua_chave_secreta
+   DATABASE_URL=postgres://usuario:senha@localhost:5432/zeus
+   EMAIL_USER=seu_email@gmail.com
+   EMAIL_PASS=sua_senha
+   ```
+
+3. Suba os containers Docker:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. Acesse a aplicação em `http://localhost:4001`.
+
+## Testes
+Execute os testes automatizados com Jest:
+```bash
+npm test
+```
+
+## Como Contribuir
+1. Faça um fork do repositório.
+2. Crie uma branch para sua feature:
+   ```bash
+   git checkout -b minha-feature
+   ```
+3. Faça commit das suas alterações:
+   ```bash
+   git commit -m 'Minha nova feature'
+   ```
+4. Envie para o repositório remoto:
+   ```bash
+   git push origin minha-feature
+   ```
+5. Abra um Pull Request.
+
+## Licença
+Este projeto está licenciado sob a licença MIT.
 
 ## 🧑‍💻 Regras de código adotadas
 
@@ -47,28 +115,6 @@ O Projeto Zeus é um sistema backend desenvolvido para gerenciar membros, client
 - Após concluir as alterações, deve ser criado um Pull Request para a branch `back`.
 - A cada 2 dias, a branch `back` deve ser mergeada na `main`, garantindo que o código esteja funcional e consistente.
 
-## 🧑‍💻 Como rodar o projeto
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/torrescf/Projeto-Zeus.git
-   cd Projeto-Zeus
-   ```
-2. Instale as dependências:
-   ```bash
-   npm install
-   ```
-3. Configure o arquivo `.env` com as variáveis de ambiente necessárias.
-4. Inicie o banco de dados PostgreSQL e rode as migrations:
-   ```bash
-   npm run migration:run
-   ```
-5. Inicie o servidor em modo de desenvolvimento:
-   ```bash
-   npm run dev
-   ```
-6. Teste os endpoints utilizando o Insomnia ou outro cliente REST.
-
 ## 🔐 Arquivo .env
 
 As seguintes variáveis de ambiente são necessárias para o funcionamento do sistema:
@@ -84,23 +130,28 @@ EMAIL_USER= seu email
 EMAIL_PASS= sua senha
 ```
 
-## 📁 Estrutura de pastas
+### Estrutura de Pastas 
 
 ```
-├── src
-│   ├── config/               # Configurações do banco de dados e ambiente
-│   ├── controllers/          # Controladores das rotas
-│   ├── entities/             # Entidades do banco de dados (TypeORM)
-│   ├── middlewares/          # Middlewares de autenticação e validação
-│   ├── routes/               # Definição das rotas da API
-│   ├── services/             # Lógica de negócio
-│   ├── tests/                # Testes automatizados
-│   ├── index.ts              # Ponto de entrada da aplicação
-├── public/                   # Arquivos estáticos (ex.: interface visual)
-├── .env                      # Variáveis de ambiente
-├── package.json              # Dependências e scripts do projeto
-├── tsconfig.json             # Configuração do TypeScript
-└── README.md                 # Documentação do projeto
+src/
+├── app/                     # Configurações principais da aplicação
+│   ├── app.js               # Configuração do Express
+│   ├── index.js             # Ponto de entrada da aplicação
+│   ├── swagger.json         # Configuração do Swagger
+│   ├── data-source.ts       # Configuração do banco de dados
+│   ├── setupTests.ts        # Configuração de testes
+├── controllers/             # Controladores das rotas
+├── entities/                # Entidades do banco de dados (TypeORM)
+├── middlewares/             # Middlewares de autenticação e validação
+├── routes/                  # Definição das rotas da API
+├── services/                # Lógica de negócios
+├── tests/                   # Testes automatizados
+public/                      # Arquivos estáticos
+scripts/                     # Scripts auxiliares
+.env                          # Variáveis de ambiente
+package.json                  # Dependências e scripts do projeto
+tsconfig.json                 # Configuração do TypeScript
+jest.config.js                # Configuração do Jest
 ```
 
 ## Justificativa do Banco de Dados

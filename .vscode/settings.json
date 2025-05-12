@@ -1,0 +1,11 @@
+{
+    "editor.fontSize": 16,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always"
+    },
+    "eslint.validate": [
+        "javascript"
+        , "javascriptreact", "typescript", "typescriptreact", "vue", "html", "json"
+        , "markdown", "yaml", "css", "scss", "less", "graphql", "handlebars", "php"
+    ]
+}

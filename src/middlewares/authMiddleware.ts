@@ -13,8 +13,8 @@ declare global {
     }
 }
 import jwt from "jsonwebtoken";
-import { AppDataSource } from "../config/data-source";
-import { Member } from "../entities/Member";
+import { AppDataSource } from "../database/data-source";
+import { Member } from "../database/entities/Member";
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
@@ -23,7 +23,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
             return res.status(401).json({ message: "Authentication token missing" });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret_key") as { id: number };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sua_chave_secreta_forte_aqui') as { id: number };
         const memberRepository = AppDataSource.getRepository(Member);
         
         const member = await memberRepository.findOne({ where: { id: decoded.id } });

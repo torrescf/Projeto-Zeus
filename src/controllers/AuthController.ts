@@ -2,13 +2,32 @@
 // Inclui métodos para login, registro, recuperação e redefinição de senha.
 
 import { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
-import { Member } from "../entities/Member";
+import { AppDataSource } from "../database/data-source";
+import { Member } from "../database/entities/Member";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { MoreThan, Column } from "typeorm";
+import rateLimit from "express-rate-limit";
+import { addHours } from "date-fns";
+
+// Limitação de tentativas de login
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 5, // Máximo de 5 tentativas
+    message: { message: 'Muitas tentativas de login. Tente novamente mais tarde.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Adicionando limitador para envio de e-mails
+const emailLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minuto
+    max: 3, // Máximo de 3 e-mails por minuto
+    message: { message: 'Muitas solicitações de envio de e-mail. Tente novamente mais tarde.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 export class AuthController {
     private memberRepository = AppDataSource.getRepository(Member);
@@ -41,7 +60,7 @@ export class AuthController {
             // Cria o novo membro
             console.log('[AUTH] Criando novo usuário...');
             const newMember = this.memberRepository.create({
-                name,
+                nomeCompleto: name,
                 email,
                 password: hashedPassword,
                 role: role || "member",
@@ -66,145 +85,91 @@ export class AuthController {
     }
 
     async login(req: Request, res: Response) {
-        console.log('[AUTH] Login endpoint hit - Dados recebidos:', req.body);
-        
+        const { email, password } = req.body;
+
         try {
-            const { email, password } = req.body;
-
+            // Validação de entrada
             if (!email || !password) {
-                console.log('[AUTH] Falha na validação: Email ou senha faltando');
-                return res.status(400).json({ message: "Email and password are required" });
+                return res.status(400).json({ message: 'Email e senha são obrigatórios' });
             }
 
-            // Encontra o usuário
-            console.log('[AUTH] Buscando usuário:', email);
-            const member = await this.memberRepository.findOne({ 
-                where: { email },
-                select: ['id', 'name', 'email', 'password', 'role', 'isActive']
-            });
+            const member = await this.memberRepository.findOne({ where: { email }, select: ['id', 'password', 'role'] });
 
-            if (!member) {
-                console.log('[AUTH] Usuário não encontrado:', email);
-                return res.status(401).json({ message: "Invalid credentials" });
+            if (!member || !(await bcrypt.compare(password, member.password))) {
+                return res.status(401).json({ message: 'Credenciais inválidas' });
             }
 
-            // Verifica a senha
-            console.log('[AUTH] Verificando senha...');
-            const isPasswordValid = await bcrypt.compare(password, member.password);
-            if (!isPasswordValid) {
-                console.log('[AUTH] Senha inválida para usuário:', email);
-                return res.status(401).json({ message: "Invalid credentials" });
-            }
-
-            // Gera o token JWT
-            console.log('[AUTH] Gerando token JWT...');
             const token = jwt.sign(
-                { 
-                    id: member.id, 
-                    email: member.email, 
-                    role: member.role 
-                },
-                process.env.JWT_SECRET || "your_jwt_secret_key",
-                { expiresIn: "1h" }
+                { id: member.id, role: member.role },
+                process.env.JWT_SECRET || 'sua_chave_secreta_forte_aqui',
+                { expiresIn: '1h' } // Expiração de 1 hora
             );
 
-            // Remove a senha antes de retornar
-            const { password: _, ...memberWithoutPassword } = member;
+            // Adicionar refreshToken opcional
+            const refreshToken = jwt.sign(
+                { id: member.id },
+                process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
+                { expiresIn: '7d' } // Expiração de 7 dias
+            );
 
-            console.log('[AUTH] Login bem-sucedido para usuário:', member.id);
-            return res.json({
-                member: memberWithoutPassword,
-                token
-            });
-
+            res.json({ token, refreshToken });
         } catch (error) {
-            console.error('[AUTH] Erro durante o login:', error);
-            return res.status(500).json({ 
-                message: "Internal server error",
-                error: error instanceof Error ? error.message : "Unknown error"
-            });
+            res.status(500).json({ message: 'Erro interno do servidor', error });
         }
     }
 
     async forgotPassword(req: Request, res: Response) {
+        const { email } = req.body;
+
         try {
-            const { email } = req.body;
-
-            if (!email) {
-                return res.status(400).json({ message: "Email is required" });
-            }
-
             const member = await this.memberRepository.findOne({ where: { email } });
+
             if (!member) {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(404).json({ message: 'Usuário não encontrado' });
             }
 
-            // Generate a reset token
-            const resetToken = crypto.randomBytes(32).toString("hex");
-            const resetTokenHash = crypto.createHash("sha256").update(resetToken).digest("hex");
-
-            // Save the hashed token and expiration in the database
-            member.resetPasswordToken = resetTokenHash;
-            member.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+            const token = crypto.randomBytes(20).toString('hex');
+            member.resetToken = token;
+            member.resetPasswordExpires = addHours(new Date(), 1); // Expira em 1 hora
             await this.memberRepository.save(member);
 
-            // Send email with the reset token
             const transporter = nodemailer.createTransport({
-                service: "Gmail",
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
-                },
+                service: 'Gmail',
+                auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
             });
-
-            const resetUrl = `${req.protocol}://${req.get("host")}/auth/reset-password/${resetToken}`;
-            const message = `You requested a password reset. Click the link to reset your password: ${resetUrl}`;
 
             await transporter.sendMail({
                 to: email,
-                subject: "Password Reset Request",
-                text: message,
+                subject: 'Redefinição de Senha',
+                html: `<a href="${process.env.APP_URL}/reset-password?token=${token}">Clique aqui para redefinir sua senha</a>`
             });
 
-            res.status(200).json({ message: "Password reset email sent" });
+            res.json({ message: 'E-mail de redefinição enviado' });
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Internal server error" });
+            res.status(500).json({ message: 'Erro ao enviar e-mail', error });
         }
     }
 
     async resetPassword(req: Request, res: Response) {
+        const { token, password } = req.body;
+
         try {
-            const { token } = req.params;
-            const { password } = req.body;
-
-            if (!password) {
-                return res.status(400).json({ message: "Password is required" });
-            }
-
-            const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
-
-            const member = await this.memberRepository.findOne({
-                where: {
-                    resetPasswordToken: resetTokenHash,
-                    resetPasswordExpires: MoreThan(new Date()),
-                },
-            });
+            const member = await this.memberRepository.findOne({ where: { resetToken: token } });
 
             if (!member) {
-                return res.status(400).json({ message: "Invalid or expired token" });
+                return res.status(400).json({ message: 'Token inválido ou expirado' });
             }
 
-            // Update the password
             member.password = await bcrypt.hash(password, 10);
-            member.resetPasswordToken = null as unknown as string; // Corrigido para evitar erro de tipo
-            member.resetPasswordExpires = null as unknown as Date; // Corrigido para evitar erro de tipo
+            member.resetToken = undefined;
             await this.memberRepository.save(member);
 
-            res.status(200).json({ message: "Password reset successfully" });
+            res.json({ message: 'Senha redefinida com sucesso' });
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Internal server error" });
+            res.status(500).json({ message: 'Erro ao redefinir senha', error });
         }
     }
 }
+
+// Exportando os limitadores para uso nas rotas
+export { loginLimiter, emailLimiter };

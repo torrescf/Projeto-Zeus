@@ -1,175 +1,132 @@
-// Controlador responsável por gerenciar orçamentos.
-// Inclui métodos para criação, listagem, atualização e exclusão.
+import { Request, Response } from 'express';
+import { AppDataSource } from "../database/data-source";
+import { Budget } from '../database/entities/Budget';
+import { Member } from '../database/entities/Member';
 
-import { NextFunction, Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
-import { Budget } from "../entities/Budget";
-import { Member } from "../entities/Member";
-import { Client } from "../entities/Client";
-import { sendBudgetStatusEmail, sendBudgetStatusNotification } from "../services/emailService";
-import { BudgetService } from "../services/budgetService";
+export const createBudget = async (req: Request, res: Response) => {
+    const { numeroOrcamento, descricaoProjeto, cliente, membroResponsavelId, valorEstimado, custosPrevistos } = req.body;
 
-export class BudgetController {
-    private budgetService = new BudgetService();
-
-    async create(req: Request, res: Response) {
-        try {
-            const { title, description, amount, clientId } = req.body;
-            const budgetRepository = AppDataSource.getRepository(Budget);
-            const memberRepository = AppDataSource.getRepository(Member);
-            const clientRepository = AppDataSource.getRepository(Client);
-
-            const member = await memberRepository.findOne({ where: { id: Number(req.userId) } });
-            if (!member) {
-                return res.status(404).json({ message: "Member not found" });
-            }
-
-            const client = await clientRepository.findOne({ where: { id: clientId } });
-            if (!client) {
-                return res.status(404).json({ message: "Client not found" });
-            }
-
-            const budget = budgetRepository.create({
-                title,
-                description,
-                amount,
-                status: 'pending',
-                createdBy: member,
-                client,
-            });
-
-            await budgetRepository.save(budget);
-            res.status(201).json(budget);
-        } catch (error) {
-            console.error(error);
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            res.status(500).json({ message: errorMessage });
+    try {
+        // Validações adicionais
+        if (!numeroOrcamento || !descricaoProjeto || !cliente || !membroResponsavelId || !valorEstimado || !custosPrevistos) {
+            return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos' });
         }
-    }
 
-    async getAll(req: Request, res: Response) {
-        try {
-            const { status, memberId } = req.query;
-            const budgetRepository = AppDataSource.getRepository(Budget);
+        const memberRepository = AppDataSource.getRepository(Member);
+        const member = await memberRepository.findOne({ where: { id: parseInt(membroResponsavelId) } });
 
-            const budgets = await budgetRepository.find({
-                where: {
-                    ...(status && { status: status as string }),
-                    ...(memberId && { createdBy: { id: Number(memberId) } })
-                } as any, // Explicitly cast to avoid type errors
-                relations: ["createdBy", "client"]
-            });
-
-            res.json(budgets);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Internal server error" });
+        if (!member) {
+            return res.status(404).json({ message: 'Membro responsável não encontrado' });
         }
+
+        const budgetRepository = AppDataSource.getRepository(Budget);
+
+        const newBudget = budgetRepository.create({
+            numeroOrcamento,
+            descricaoProjeto,
+            cliente,
+            membroResponsavelId,
+            valorEstimado,
+            custosPrevistos,
+            dataCriacao: new Date(),
+            status: 'em_analise',
+        });
+
+        await budgetRepository.save(newBudget);
+        const budgets = await budgetRepository.find(); // Listar todos os orçamentos após criação
+        res.status(201).json(budgets);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao criar orçamento', error });
     }
+};
 
-    async getById(req: Request, res: Response) {
-        try {
-            const budgetRepository = AppDataSource.getRepository(Budget);
-            const budget = await budgetRepository.findOne({
-                where: { id: parseInt(req.params.id) },
-                relations: ["createdBy", "client"],
-            });
-
-            if (!budget) {
-                return res.status(404).json({ message: "Budget not found" });
-            }
-
-            res.json(budget);
-        } catch (error) {
-            console.error(error);
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            res.status(500).json({ message: errorMessage });
-        }
+export const getBudgets = async (req: Request, res: Response) => {
+    try {
+        const budgetRepository = AppDataSource.getRepository(Budget);
+        const budgets = await budgetRepository.find();
+        res.json(budgets);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao buscar orçamentos', error });
     }
+};
 
-    async update(req: Request, res: Response) {
-        try {
-            const budgetRepository = AppDataSource.getRepository(Budget);
-            const result = await budgetRepository.update(req.params.id, req.body);
+export const getBudgetById = async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-            if (result.affected === 0) {
-                return res.status(404).json({ message: "Budget not found" });
-            }
+    try {
+        const budgetRepository = AppDataSource.getRepository(Budget);
+        const budget = await budgetRepository.findOne({ where: { id: parseInt(id) } });
 
-            res.status(200).json({ message: "Budget updated successfully" });
-        } catch (error) {
-            console.error(error);
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            res.status(500).json({ message: errorMessage });
-        }
+        if (!budget) return res.status(404).json({ message: 'Orçamento não encontrado' });
+
+        res.json(budget);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao buscar orçamento', error });
     }
+};
 
-    async delete(req: Request, res: Response) {
-        try {
-            const budgetRepository = AppDataSource.getRepository(Budget);
-            const result = await budgetRepository.delete(req.params.id);
+export const updateBudget = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { numeroOrcamento, descricaoProjeto, cliente, membroResponsavelId, valorEstimado, custosPrevistos } = req.body;
 
-            if (result.affected === 0) {
-                return res.status(404).json({ message: "Budget not found" });
-            }
+    try {
+        const budgetRepository = AppDataSource.getRepository(Budget);
+        const budget = await budgetRepository.findOne({ where: { id: parseInt(id) } });
 
-            res.status(200).json({ message: "Budget deleted successfully" });
-        } catch (error) {
-            console.error(error);
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            res.status(500).json({ message: errorMessage });
-        }
+        if (!budget) return res.status(404).json({ message: 'Orçamento não encontrado' });
+
+        Object.assign(budget, { numeroOrcamento, descricaoProjeto, cliente, membroResponsavelId, valorEstimado, custosPrevistos });
+        await budgetRepository.save(budget);
+
+        res.status(200).json(budget);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao atualizar orçamento', error });
     }
+};
 
-    async updateStatus(req: Request, res: Response) {
-        const { id } = req.params;
-        const { status } = req.body;
-        const changedBy = req.user as Member;
+export const deleteBudget = async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-        try {
-            const budgetRepository = AppDataSource.getRepository(Budget);
-            const budget = await budgetRepository.findOneBy({ id: parseInt(id) });
-            if (!budget) return res.status(404).json({ message: "Budget not found" });
+    try {
+        const budgetRepository = AppDataSource.getRepository(Budget);
+        const result = await budgetRepository.delete(id);
 
-            const previousStatus = budget.status;
-            await this.budgetService.updateBudget(Number(id), { status }, changedBy);
+        if (result.affected === 0) return res.status(404).json({ message: 'Orçamento não encontrado' });
 
-            await sendBudgetStatusNotification(budget, previousStatus);
-            res.sendStatus(200);
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            res.status(500).send(errorMessage);
-        }
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao excluir orçamento', error });
     }
+};
 
-    async sendForApproval(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const budgetRepository = AppDataSource.getRepository(Budget);
+export const changeBudgetStatus = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
 
-            const budget = await budgetRepository.findOneBy({ id: parseInt(id) });
-            if (!budget) return res.status(404).json({ message: "Budget not found" });
+    try {
+        const budgetRepository = AppDataSource.getRepository(Budget);
+        const budget = await budgetRepository.findOne({ where: { id: parseInt(id) } });
 
-            budget.status = "pending"; // Corrigido para usar um valor válido
-            await budgetRepository.save(budget);
+        if (!budget) return res.status(404).json({ message: 'Orçamento não encontrado' });
 
-            res.status(200).json({ message: "Budget sent for approval", budget });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Internal server error" });
-        }
+        budget.status = status;
+        await budgetRepository.save(budget);
+
+        res.status(200).json(budget);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao alterar status do orçamento', error });
     }
+};
 
-    async getPendingBudgets(req: Request, res: Response) {
-        try {
-            const budgetRepository = AppDataSource.getRepository(Budget);
-            const budgets = await budgetRepository.find({
-                where: { status: "pending" }, // Corrigido para usar um valor válido
-            });
-            res.json(budgets);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: "Internal server error" });
-        }
+export const getBudgetsByUser = async (req: Request, res: Response) => {
+    const userId = req.userId; // Obtido do middleware de autenticação
+
+    try {
+        const budgetRepository = AppDataSource.getRepository(Budget);
+        const budgets = await budgetRepository.find({ where: { membroResponsavelId: userId } });
+
+        res.json(budgets);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao buscar orçamentos do usuário', error });
     }
-}
+};

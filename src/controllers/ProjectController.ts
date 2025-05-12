@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
-import { Project } from "../entities/Project";
-import { Member } from "../entities/Member";
-import { Budget } from "../entities/Budget";
+import { AppDataSource } from "../database/data-source";
+import { Project } from "../database/entities/Project";
+import { Member } from "../database/entities/Member";
+import { Budget } from "../database/entities/Budget";
 
 export class ProjectController {
     private projectRepository = AppDataSource.getRepository(Project);

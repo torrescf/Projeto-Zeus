@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
-import { Equipment } from "../entities/Equipment";
-import { Member } from "../entities/Member";
+import { AppDataSource } from "../database/data-source";
+import { Equipment } from "../database/entities/Equipment";
+import { Member } from "../database/entities/Member";
 
 export class EquipmentController {
     private equipmentRepository = AppDataSource.getRepository(Equipment);

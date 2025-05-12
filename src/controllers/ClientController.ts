@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
-import { Client } from "../entities/Client";
+import { AppDataSource } from "../database/data-source";
+import { Client } from "../database/entities/Client";
 
 export class ClientController {
     private clientRepository = AppDataSource.getRepository(Client);

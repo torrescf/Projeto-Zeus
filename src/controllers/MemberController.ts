@@ -1,66 +1,112 @@
-// Controlador responsável por gerenciar membros.
-// Inclui métodos para criação, listagem, atualização e exclusão.
+import { Request, Response } from 'express';
+import { AppDataSource } from "../database/data-source";
+import { Member } from '../database/entities/Member';
+import { body } from 'express-validator';
 
-import { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
-import { Member } from "../entities/Member";
+export const createMember = async (req: Request, res: Response) => {
+    const { nomeCompleto, dataNascimento, emailInstitucional, cargo, telefone, genero, dataIngresso, habilidades } = req.body;
+    const foto = req.file?.path;
 
-export class MemberController {
-    private memberRepository = AppDataSource.getRepository(Member);
-
-    async create(req: Request, res: Response) {
-        try {
-            const member = this.memberRepository.create(req.body);
-            await this.memberRepository.save(member);
-            res.status(201).json({ message: "Member created successfully", member });
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                res.status(500).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "Erro desconhecido" });
-            }
+    try {
+        // Validações adicionais
+        if (!emailInstitucional.endsWith('@compjunior.com.br')) { // Atualizado para o domínio correto
+            return res.status(400).json({ message: 'O email deve pertencer ao domínio compjunior.com.br' });
         }
-    }
 
-    async getAll(req: Request, res: Response) {
-        const members = await this.memberRepository.find();
+        if (new Date(dataNascimento) >= new Date()) {
+            return res.status(400).json({ message: 'A data de nascimento deve ser anterior à data atual' });
+        }
+
+        if (new Date(dataIngresso) >= new Date()) {
+            return res.status(400).json({ message: 'A data de ingresso deve ser anterior à data atual' });
+        }
+
+        const memberRepository = AppDataSource.getRepository(Member);
+
+        const newMember = memberRepository.create({
+            nomeCompleto,
+            email: emailInstitucional,
+            password: '', // Define a default or hashed password if necessary
+            role: cargo,
+            isActive: true, // Default to active, adjust as needed
+            skills: habilidades,
+            gender: genero,
+            phone: telefone,
+            photo: foto,
+        });
+
+        await memberRepository.save(newMember);
+        const members = await memberRepository.find(); // Listar todos os membros após criação
+        res.status(201).json(members);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao criar membro', error });
+    }
+};
+
+export const getMembers = async (req: Request, res: Response) => {
+    try {
+        const memberRepository = AppDataSource.getRepository(Member);
+        const members = await memberRepository.find();
         res.json(members);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao buscar membros', error });
     }
+};
 
-    async getById(req: Request, res: Response) {
-        try {
-            const member = await this.memberRepository.findOneBy({ 
-                id: parseInt(req.params.id) 
+export const getMemberById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const memberRepository = AppDataSource.getRepository(Member);
+        const member = await memberRepository.findOne({ where: { id: parseInt(id) } });
+
+        if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
+
+        res.json(member);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao buscar membro', error });
+    }
+};
+
+export const updateMember = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { nomeCompleto, dataNascimento, emailInstitucional, cargo, telefone, genero, dataIngresso, habilidades } = req.body;
+    const foto = req.file?.path;
+
+    try {
+        const memberRepository = AppDataSource.getRepository(Member);
+        const member = await memberRepository.findOne({ where: { id: parseInt(id) } });
+
+        if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
+
+        Object.assign(member, { nomeCompleto, dataNascimento, emailInstitucional, cargo, telefone, genero, foto, dataIngresso, habilidades });
+        await memberRepository.save(member);
+
+        res.status(200).json(member);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao atualizar membro', error });
+    }
+};
+
+export const deleteMember = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const memberRepository = AppDataSource.getRepository(Member);
+        const member = await memberRepository.findOne({ where: { id: parseInt(id) } });
+
+        if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
+
+        // Confirmação antes de excluir
+        if (!req.query.confirm || req.query.confirm !== 'true') {
+            return res.status(400).json({
+                message: 'Confirmação necessária para excluir o membro. Adicione ?confirm=true à URL.',
             });
-            member ? res.json(member) : res.status(404).json({ message: "Membro não encontrado" });
-        } catch (error: unknown) {
-            this.handleError(res, error);
         }
-    }
 
-    async update(req: Request, res: Response) {
-        try {
-            await this.memberRepository.update(req.params.id, req.body);
-            res.status(204).send();
-        } catch (error: unknown) {
-            this.handleError(res, error);
-        }
+        await memberRepository.delete(id);
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao excluir membro', error });
     }
-
-    async delete(req: Request, res: Response) {
-        try {
-            await this.memberRepository.delete(req.params.id);
-            res.status(204).send();
-        } catch (error: unknown) {
-            this.handleError(res, error);
-        }
-    }
-
-    private handleError(res: Response, error: unknown) {
-        if (error instanceof Error) {
-            res.status(500).json({ message: error.message });
-        } else {
-            res.status(500).json({ message: "Erro interno" });
-        }
-    }
-}
+};

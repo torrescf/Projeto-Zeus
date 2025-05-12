@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
-import { Penalty } from "../entities/Penalty";
-import { Member } from "../entities/Member";
+import { AppDataSource } from "../database/data-source";
+import { Penalty } from "../database/entities/Penalty";
+import { Member } from "../database/entities/Member";
 
 export class PenaltyController {
     private penaltyRepository = AppDataSource.getRepository(Penalty);

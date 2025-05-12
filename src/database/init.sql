@@ -1,0 +1,64 @@
+﻿-- Script de inicialização do banco de dados Zeus
+-- Configurações iniciais, criação de tabelas e extensões necessárias.
+
+\connect template1
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Cria o banco zeus_admin se não existir
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_database WHERE datname = 'zeus_admin') THEN
+        PERFORM dblink_exec('dbname=postgres', 'CREATE DATABASE zeus_admin');
+    END IF;
+END $$;
+
+-- Conecta ao banco zeus_admin
+\connect zeus_admin
+
+-- Recria a extensão no banco zeus_admin
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Tabela de membros
+CREATE TABLE IF NOT EXISTS members (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    is_active BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela de clientes
+CREATE TABLE IF NOT EXISTS clients (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela de projetos (exemplo de relacionamento)
+CREATE TABLE IF NOT EXISTS projects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    client_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (client_id) REFERENCES clients (id) ON DELETE CASCADE
+);
+
+-- Tabela de orçamentos (budgets)
+CREATE TABLE IF NOT EXISTS budgets (
+    id SERIAL PRIMARY KEY,
+    project_id INT NOT NULL,
+    amount NUMERIC(15, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
+);
+
+-- Índices para melhorar a performance
+CREATE INDEX IF NOT EXISTS idx_members_email ON members (email);
+CREATE INDEX IF NOT EXISTS idx_clients_email ON clients (email);
+CREATE INDEX IF NOT EXISTS idx_projects_client_id ON projects (client_id);
+CREATE INDEX IF NOT EXISTS idx_budgets_project_id ON budgets (project_id);
