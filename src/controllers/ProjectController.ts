@@ -10,26 +10,25 @@ export class ProjectController {
     private budgetRepository = AppDataSource.getRepository(Budget);
 
     async create(req: Request, res: Response) {
-        const { leaderId, budgetId, ...projectData } = req.body;
-        const leader = await this.memberRepository.findOneBy({ id: leaderId });
-        const budget = await this.budgetRepository.findOneBy({ id: budgetId });
+        const { membroResponsavelId, ...projectData } = req.body;
+        const membroResponsavel = await this.memberRepository.findOneBy({ id: membroResponsavelId });
 
-        if (!leader || !budget) return res.status(404).json({ message: "Leader or Budget not found" });
+        if (!membroResponsavel) return res.status(404).json({ message: "Membro responsável não encontrado" });
 
-        const project = this.projectRepository.create({ ...projectData, leader, budget });
+        const project = this.projectRepository.create({ ...projectData, membroResponsavel });
         await this.projectRepository.save(project);
         res.status(201).json(project);
     }
 
     async getAll(req: Request, res: Response) {
-        const projects = await this.projectRepository.find({ relations: ["leader", "budget"] });
+        const projects = await this.projectRepository.find({ relations: ["membroResponsavel", "client", "membrosEquipe"] });
         res.json(projects);
     }
 
     async getById(req: Request, res: Response) {
         const project = await this.projectRepository.findOne({
             where: { id: parseInt(req.params.id) },
-            relations: ["leader", "budget"],
+            relations: ["membroResponsavel", "client", "membrosEquipe"],
         });
         project ? res.json(project) : res.status(404).json({ message: "Project not found" });
     }

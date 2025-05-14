@@ -1,5 +1,18 @@
 import request from "supertest";
 import { app } from "../../src/app/index";
+import { AppDataSource } from "../../src/database/data-source";
+
+beforeAll(async () => {
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
+  }
+});
+
+afterAll(async () => {
+  if (AppDataSource.isInitialized) {
+    await AppDataSource.destroy();
+  }
+});
 
 describe("Budget Endpoints", () => {
     it("should create a budget with valid data", async () => {
@@ -9,7 +22,7 @@ describe("Budget Endpoints", () => {
                 numeroOrcamento: "BUD-001",
                 descricaoProjeto: "Test Budget",
                 cliente: "Test Client",
-                membroResponsavelId: 1,
+                membroResponsavel: 1,
                 valorEstimado: 1000,
                 custosPrevistos: 800
             });

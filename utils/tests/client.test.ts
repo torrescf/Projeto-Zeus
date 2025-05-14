@@ -1,5 +1,18 @@
 import request from "supertest";
 import { app } from "../../src/app/index";
+import { AppDataSource } from "../../src/database/data-source";
+
+beforeAll(async () => {
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
+  }
+});
+
+afterAll(async () => {
+  if (AppDataSource.isInitialized) {
+    await AppDataSource.destroy();
+  }
+});
 
 describe("Client Endpoints", () => {
     it("should create a client", async () => {

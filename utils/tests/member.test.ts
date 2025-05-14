@@ -1,5 +1,18 @@
 import request from "supertest";
 import { app } from "../../src/app/index";
+import { AppDataSource } from "../../src/database/data-source";
+
+beforeAll(async () => {
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize();
+  }
+});
+
+afterAll(async () => {
+  if (AppDataSource.isInitialized) {
+    await AppDataSource.destroy();
+  }
+});
 
 describe("Member Endpoints", () => {
     it("should create a member with valid data", async () => {

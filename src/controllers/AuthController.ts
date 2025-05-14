@@ -71,7 +71,8 @@ export class AuthController {
             console.log('[AUTH] Usuário criado com ID:', newMember.id);
 
             // Remove a senha antes de retornar
-            const { password: _, ...memberWithoutPassword } = newMember;
+            const memberWithoutPassword: Omit<Member, 'password'> & { password?: string } = { ...newMember };
+            delete memberWithoutPassword.password;
 
             return res.status(201).json(memberWithoutPassword);
 

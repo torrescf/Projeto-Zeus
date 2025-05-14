@@ -18,7 +18,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 }
 
 export async function sendBudgetStatusEmail(budget: Budget, previousStatus: string) {
-    const recipientEmail = budget.membroResponsavelId?.toString(); // Convertendo ID para string temporariamente
+    const recipientEmail = budget.membroResponsavel?.toString(); // Convertendo ID para string temporariamente
 
     if (!recipientEmail) {
         throw new Error("O email do membro responsável não foi encontrado.");
@@ -37,7 +37,7 @@ export async function sendBudgetStatusEmail(budget: Budget, previousStatus: stri
 }
 
 export async function sendBudgetStatusNotification(budget: Budget, previousStatus: string) {
-    const recipientEmail = budget.membroResponsavelId?.toString(); // Convertendo ID para string temporariamente
+    const recipientEmail = budget.membroResponsavel?.toString(); // Convertendo ID para string temporariamente
 
     if (!recipientEmail) {
         throw new Error("O email do membro responsável não foi encontrado.");

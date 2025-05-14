@@ -5,7 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Project } from "./Project";
 import { Budget } from "./Budget";
 
-@Entity('clients')
+@Entity('client')
 export class Client {
     @PrimaryGeneratedColumn()
     id: number;

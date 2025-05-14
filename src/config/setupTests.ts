@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 console.log('[DEBUG] Loaded environment variables:', process.env);
 console.log('[DEBUG] JWT_SECRET:', process.env.JWT_SECRET);
-import { app } from "../app/index";
+import { app } from "../app/app";
 import { createServer } from "http";
 //import { createConnection, getConnection } from 'typeorm';
 

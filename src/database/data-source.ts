@@ -10,7 +10,7 @@ import winston from 'winston';
 dotenv.config();
 
 if (process.env.NODE_ENV === 'test') {
-    process.env.DB_HOST = process.env.DB_HOST || 'localhost';
+    process.env.DB_HOST = process.env.DB_HOST || 'db';
     process.env.DB_PORT = process.env.DB_PORT || '5432';
     process.env.DB_USER = process.env.DB_USER || 'postgres';
     process.env.DB_PASSWORD = process.env.DB_PASSWORD || '147afj';
@@ -41,15 +41,15 @@ const isMigrationContext = process.argv.some(arg => arg.includes('typeorm'));
 let env;
 if (!isMigrationContext) {
     env = cleanEnv(process.env, {
-        FRONTEND_URL: url({ desc: 'URL do frontend', default: 'http://localhost:5173' }),
+        FRONTEND_URL: url({ desc: 'URL do frontend', default: 'http://db:5173' }),
         PORT: port({ default: 4001, desc: 'Porta do servidor' }),
-        DATABASE_URL: str({ desc: 'URL de conexão com o banco de dados', default: 'postgres://postgres:147afj@localhost:5432/zeus_admin' }),
+        DATABASE_URL: str({ desc: 'URL de conexão com o banco de dados', default: 'postgres://postgres:147afj@db:5432/zeus_admin' }),
         EMAIL_USER: str({ desc: 'Usuário do email', default: 'default@example.com' }),
         EMAIL_PASS: str({ desc: 'Senha do email', default: 'password' }),
-        APP_URL: url({ desc: 'URL da aplicação', default: 'http://localhost:4001' }),
+        APP_URL: url({ desc: 'URL da aplicação', default: 'http://db:4001' }),
         JWT_SECRET: str({ desc: 'Segredo para tokens JWT', default: 'sua_chave_secreta_forte_aqui' }),
         NODE_ENV: str({ choices: ['development', 'production', 'test'], default: 'development', desc: 'Ambiente de execução' }),
-        DB_HOST: str({ desc: 'Host do banco de dados', default: 'localhost' }),
+        DB_HOST: str({ desc: 'Host do banco de dados', default: 'db' }),
         DB_PORT: str({ desc: 'Porta do banco de dados', default: '5432' }),
         DB_USER: str({ desc: 'Usuário do banco de dados', default: 'postgres' }),
         DB_PASSWORD: str({ desc: 'Senha do banco de dados', default: '147afj' }),
@@ -62,15 +62,23 @@ console.log("Iniciando a configuração do AppDataSource...");
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: process.env.DB_HOST || "localhost",
+    host: process.env.DB_HOST || "db",
     port: parseInt(process.env.DB_PORT || "5432"),
     username: process.env.DB_USER || "postgres",
     password: process.env.DB_PASSWORD || "147afj",
     database: process.env.DB_NAME || "zeus_admin",
     synchronize: false,
     logging: true,
-    entities: ["src/database/entities/*.ts"],
-    migrations: ["src/database/migrations/*.ts"],
+    entities: [
+        process.env.NODE_ENV === 'production'
+            ? "dist/database/entities/*.js"
+            : "src/database/entities/*.{ts,js}"
+    ],
+    migrations: [
+        process.env.NODE_ENV === 'production'
+            ? "dist/database/migrations/*.js"
+            : "src/database/migrations/*.{ts,js}"
+    ],
     subscribers: [],
 });
 

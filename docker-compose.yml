@@ -25,7 +25,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init-scripts:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -41,7 +41,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DB_HOST: localhost
+      DB_HOST: db
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: 147afj
@@ -57,7 +57,7 @@ services:
       - .:/app
       - /app/node_modules
     working_dir: /app
-    command: sh -c "./wait-for-it.sh db:5432 -- npm run dev"  # Removido o wait-for-it
+    command: sh -c "./wait-for-it.sh db:5432 -- npm run dev"
     networks:
       - default
 
@@ -68,6 +68,7 @@ services:
       - "4001:4001"
     environment:
       - PORT=4001
+      - NODE_ENV=production
     depends_on:
       - db
     volumes:

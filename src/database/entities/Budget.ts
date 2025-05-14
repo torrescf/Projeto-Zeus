@@ -17,11 +17,12 @@ export class Budget {
     @Column()
     descricaoProjeto: string;
 
-    @Column()
-    cliente: string;
+    // Relacionamento com o cliente
+    @ManyToOne(() => Client, { nullable: false })
+    cliente: Client;
 
-    @Column()
-    membroResponsavelId: number;
+    @ManyToOne(() => Member, (member) => member.budgets, { nullable: true })
+    membroResponsavel: Member;
 
     @Column("decimal", { precision: 10, scale: 2 })
     valorEstimado: number;
@@ -29,7 +30,7 @@ export class Budget {
     @Column("decimal", { precision: 10, scale: 2 })
     custosPrevistos: number;
 
-    @Column()
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     dataCriacao: Date;
 
     @Column()

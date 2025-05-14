@@ -19,19 +19,19 @@ export class Project {
     @Column()
     status: string; // 'planning', 'in_progress', 'completed'
 
-    @Column()
+    @Column({ type: "timestamp", nullable: true })
     startDate: Date;
 
-    @Column({ nullable: true })
+    @Column({ type: "timestamp", nullable: true })
     endDate: Date;
 
-    @ManyToOne(() => Member, member => member.ledProjects)
-    leader: Member;
+    @ManyToOne(() => Member, member => member.ledProjects, { nullable: true })
+    membroResponsavel: Member;
 
-    @ManyToMany(() => Member)
+    @ManyToMany(() => Member, { nullable: true })
     @JoinTable()
-    team: Member[];
+    membrosEquipe: Member[];
 
-    @ManyToOne(() => Client, (client: Client) => client.projects) // Adicionado tipo explícito
+    @ManyToOne(() => Client, (client: Client) => client.projects, { nullable: true })
     client: Client;
 }

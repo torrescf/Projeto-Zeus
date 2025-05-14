@@ -52,10 +52,10 @@ export class Member {
     @Column({ nullable: true })
     resetToken?: string;
 
-    @OneToMany(() => Budget, (budget) => budget.membroResponsavelId)
+    @OneToMany(() => Budget, (budget) => budget.membroResponsavel)
     budgets: Budget[];
 
-    @OneToMany(() => Project, (project) => project.leader)
+    @OneToMany(() => Project, (project) => project.membroResponsavel)
     ledProjects: Project[];
 
     @OneToMany(() => Penalty, (penalty) => penalty.member)
