@@ -24,8 +24,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      - ./src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -57,7 +57,7 @@ services:
       - .:/app
       - /app/node_modules
     working_dir: /app
-    command: sh -c "./wait-for-it.sh db:5432 -- npm run dev"
+    command: sh -c "utils/scripts/wait-for-it.sh db:5432 -- npm run dev"
     networks:
       - default
 
@@ -65,10 +65,11 @@ services:
     build:
       context: .
     ports:
-      - "4001:4001"
+      - "4002:4001"
     environment:
       - PORT=4001
       - NODE_ENV=production
+      - DB_HOST=db
     depends_on:
       - db
     volumes:

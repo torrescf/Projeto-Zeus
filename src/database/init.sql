@@ -21,11 +21,18 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Tabela de membros
 CREATE TABLE IF NOT EXISTS members (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    nomeCompleto VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    is_active BOOLEAN DEFAULT FALSE,
+    isActive BOOLEAN DEFAULT FALSE,
+    skills TEXT[],
+    gender VARCHAR(20),
+    phone VARCHAR(50),
+    photo VARCHAR(255),
+    resetToken VARCHAR(255),
+    resetPasswordToken VARCHAR(255),
+    resetPasswordExpires TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

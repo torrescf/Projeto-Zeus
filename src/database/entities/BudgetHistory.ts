@@ -4,7 +4,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from "typeorm";
 import { Budget } from "./Budget";
 import { Member } from "./Member";
-@Entity()
+@Entity('budget_history')
 export class BudgetHistory {
     @PrimaryGeneratedColumn()
     id: number;

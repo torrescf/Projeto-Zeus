@@ -30,52 +30,38 @@ const emailLimiter = rateLimit({
 });
 
 export class AuthController {
-    private memberRepository = AppDataSource.getRepository(Member);
-
     async register(req: Request, res: Response) {
         console.log('[AUTH] Register endpoint hit - Dados recebidos:', req.body);
-        
         try {
-            const { name, email, password, role } = req.body;
-
-            // Validação básica
-            if (!name || !email || !password) {
+            const { nomeCompleto, email, password, role, phone, gender, skills } = req.body;
+            if (!nomeCompleto || !email || !password) {
                 console.log('[AUTH] Falha na validação: Dados incompletos');
-                return res.status(400).json({ message: "Name, email and password are required" });
+                return res.status(400).json({ message: "nomeCompleto, email e password são obrigatórios" });
             }
-
-            // Verifica se o usuário já existe
-            console.log('[AUTH] Verificando se usuário existe...');
-            const existingMember = await this.memberRepository.findOne({ where: { email } });
+            const memberRepository = AppDataSource.getRepository(Member);
+            const existingMember = await memberRepository.findOne({ where: { email } });
             if (existingMember) {
                 console.log('[AUTH] Email já em uso:', email);
                 return res.status(400).json({ message: "Email already in use" });
             }
-
-            // Criptografa a senha
             console.log('[AUTH] Criptografando senha...');
             const hashedPassword = await bcrypt.hash(password, 10);
             console.log('[AUTH] Senha criptografada com sucesso');
-
-            // Cria o novo membro
-            console.log('[AUTH] Criando novo usuário...');
-            const newMember = this.memberRepository.create({
-                nomeCompleto: name,
+            const newMember = memberRepository.create({
+                nomeCompleto,
                 email,
                 password: hashedPassword,
                 role: role || "member",
-                isActive: true
+                isActive: true,
+                phone,
+                gender,
+                skills
             });
-
-            await this.memberRepository.save(newMember);
+            await memberRepository.save(newMember);
             console.log('[AUTH] Usuário criado com ID:', newMember.id);
-
-            // Remove a senha antes de retornar
             const memberWithoutPassword: Omit<Member, 'password'> & { password?: string } = { ...newMember };
             delete memberWithoutPassword.password;
-
             return res.status(201).json(memberWithoutPassword);
-
         } catch (error) {
             console.error('[AUTH] Erro durante o registro:', error);
             return res.status(500).json({ 
@@ -94,7 +80,8 @@ export class AuthController {
                 return res.status(400).json({ message: 'Email e senha são obrigatórios' });
             }
 
-            const member = await this.memberRepository.findOne({ where: { email }, select: ['id', 'password', 'role'] });
+            const memberRepository = AppDataSource.getRepository(Member);
+            const member = await memberRepository.findOne({ where: { email }, select: ['id', 'password', 'role'] });
 
             if (!member || !(await bcrypt.compare(password, member.password))) {
                 return res.status(401).json({ message: 'Credenciais inválidas' });
@@ -123,7 +110,8 @@ export class AuthController {
         const { email } = req.body;
 
         try {
-            const member = await this.memberRepository.findOne({ where: { email } });
+            const memberRepository = AppDataSource.getRepository(Member);
+            const member = await memberRepository.findOne({ where: { email } });
 
             if (!member) {
                 return res.status(404).json({ message: 'Usuário não encontrado' });
@@ -132,7 +120,7 @@ export class AuthController {
             const token = crypto.randomBytes(20).toString('hex');
             member.resetToken = token;
             member.resetPasswordExpires = addHours(new Date(), 1); // Expira em 1 hora
-            await this.memberRepository.save(member);
+            await memberRepository.save(member);
 
             const transporter = nodemailer.createTransport({
                 service: 'Gmail',
@@ -155,7 +143,8 @@ export class AuthController {
         const { token, password } = req.body;
 
         try {
-            const member = await this.memberRepository.findOne({ where: { resetToken: token } });
+            const memberRepository = AppDataSource.getRepository(Member);
+            const member = await memberRepository.findOne({ where: { resetToken: token } });
 
             if (!member) {
                 return res.status(400).json({ message: 'Token inválido ou expirado' });
@@ -163,7 +152,7 @@ export class AuthController {
 
             member.password = await bcrypt.hash(password, 10);
             member.resetToken = undefined;
-            await this.memberRepository.save(member);
+            await memberRepository.save(member);
 
             res.json({ message: 'Senha redefinida com sucesso' });
         } catch (error) {

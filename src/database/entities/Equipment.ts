@@ -4,7 +4,7 @@ import { Member } from "./Member";
 // Entidade que representa equipamentos no sistema.
 // Inclui informações como nome, descrição e datas de criação/atualização.
 
-@Entity()
+@Entity('equipment')
 export class Equipment {
     @PrimaryGeneratedColumn()
     id: number;

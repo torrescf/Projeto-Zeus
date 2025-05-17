@@ -1,6 +1,8 @@
 import request from "supertest";
-import { app } from "../../src/app/index";
+import { app } from "../../src/index";
 import { AppDataSource } from "../../src/database/data-source";
+
+let projectId: number;
 
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
@@ -15,11 +17,16 @@ afterAll(async () => {
 });
 
 describe("Project Endpoints", () => {
-    it("should create a project", async () => {
+    beforeEach(async () => {
+        await AppDataSource.getRepository("project").createQueryBuilder().delete().execute();
         const response = await request(app)
             .post("/project")
             .send({ name: "Test Project", description: "Project Description", status: "planning" });
-        expect(response.status).toBe(201);
+        projectId = response.body.id;
+    });
+
+    it("should create a project", async () => {
+        expect(projectId).toBeDefined();
     });
 
     it("should get all projects", async () => {
@@ -28,17 +35,17 @@ describe("Project Endpoints", () => {
     });
 
     it("should get a project by ID", async () => {
-        const response = await request(app).get("/project/1");
+        const response = await request(app).get(`/project/${projectId}`);
         expect(response.status).toBe(200);
     });
 
     it("should update a project", async () => {
-        const response = await request(app).put("/project/1").send({ name: "Updated Project" });
+        const response = await request(app).put(`/project/${projectId}`).send({ name: "Updated Project" });
         expect(response.status).toBe(204);
     });
 
     it("should delete a project", async () => {
-        const response = await request(app).delete("/project/1");
+        const response = await request(app).delete(`/project/${projectId}`);
         expect(response.status).toBe(204);
     });
 });

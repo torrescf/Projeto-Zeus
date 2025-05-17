@@ -5,7 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTabl
 import { Member } from "./Member";
 import { Client } from "./Client"; // Corrigido o caminho relativo
 
-@Entity()
+@Entity('project')
 export class Project {
     @PrimaryGeneratedColumn()
     id: number;

@@ -1,0 +1,145 @@
+{
+  "info": {
+    "_postman_id": "zeus-api-collection",
+    "name": "Zeus API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]},
+        "body": {"mode": "raw", "raw": "{\n  \"nomeCompleto\": \"Test User\",\n  \"email\": \"test@compjunior.com.br\",\n  \"password\": \"password123\"\n}"}
+      }
+    },
+    {
+      "name": "Login User",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]},
+        "body": {"mode": "raw", "raw": "{\n  \"email\": \"test@compjunior.com.br\",\n  \"password\": \"password123\"\n}"}
+      }
+    },
+    {
+      "name": "Forgot Password",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": {"raw": "{{base_url}}/auth/forgot-password", "host": ["{{base_url}}"], "path": ["auth", "forgot-password"]},
+        "body": {"mode": "raw", "raw": "{\n  \"email\": \"test@compjunior.com.br\"\n}"}
+      }
+    },
+    {
+      "name": "Reset Password",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": {"raw": "{{base_url}}/auth/reset-password/{{token}}", "host": ["{{base_url}}"], "path": ["auth", "reset-password", "{{token}}"]},
+        "body": {"mode": "raw", "raw": "{\n  \"password\": \"newPassword123\"\n}"}
+      }
+    },
+    {
+      "name": "List Members",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+        "url": {"raw": "{{base_url}}/members", "host": ["{{base_url}}"], "path": ["members"]}
+      }
+    },
+    {
+      "name": "Create Member",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "{{base_url}}/members", "host": ["{{base_url}}"], "path": ["members"]},
+        "body": {"mode": "raw", "raw": "{\n  \"nomeCompleto\": \"Member Test\",\n  \"email\": \"member@compjunior.com.br\",\n  \"role\": \"member\",\n  \"phone\": \"123456789\",\n  \"gender\": \"male\",\n  \"skills\": [\"JavaScript\", \"TypeScript\"]\n}"}
+      }
+    },
+    {
+      "name": "Get Member Details",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+        "url": {"raw": "{{base_url}}/members/1", "host": ["{{base_url}}"], "path": ["members", "1"]}
+      }
+    },
+    {
+      "name": "Update Member",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "{{base_url}}/members/1", "host": ["{{base_url}}"], "path": ["members", "1"]},
+        "body": {"mode": "raw", "raw": "{\n  \"nomeCompleto\": \"Updated Member\",\n  \"email\": \"updated@compjunior.com.br\"\n}"}
+      }
+    },
+    {
+      "name": "Delete Member",
+      "request": {
+        "method": "DELETE",
+        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+        "url": {"raw": "{{base_url}}/members/1", "host": ["{{base_url}}"], "path": ["members", "1"]}
+      }
+    },
+    {
+      "name": "List Budgets",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+        "url": {"raw": "{{base_url}}/budgets", "host": ["{{base_url}}"], "path": ["budgets"]}
+      }
+    },
+    {
+      "name": "Create Budget",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "{{base_url}}/budgets", "host": ["{{base_url}}"], "path": ["budgets"]},
+        "body": {"mode": "raw", "raw": "{\n  \"title\": \"Test Budget\",\n  \"description\": \"Test Description\",\n  \"amount\": 1000,\n  \"clientId\": 1\n}"}
+      }
+    },
+    {
+      "name": "Get Budget Details",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+        "url": {"raw": "{{base_url}}/budgets/1", "host": ["{{base_url}}"], "path": ["budgets", "1"]}
+      }
+    },
+    {
+      "name": "Update Budget",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "{{base_url}}/budgets/1", "host": ["{{base_url}}"], "path": ["budgets", "1"]},
+        "body": {"mode": "raw", "raw": "{\n  \"title\": \"Updated Budget\",\n  \"description\": \"Updated Description\"\n}"}
+      }
+    },
+    {
+      "name": "Delete Budget",
+      "request": {
+        "method": "DELETE",
+        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+        "url": {"raw": "{{base_url}}/budgets/1", "host": ["{{base_url}}"], "path": ["budgets", "1"]}
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "token", "value": "your_jwt_token_here" }
+  ]
+}

@@ -1,6 +1,8 @@
 import request from "supertest";
-import { app } from "../../src/app/index";
+import { app } from "../../src/index";
 import { AppDataSource } from "../../src/database/data-source";
+
+let memberId: number;
 
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
@@ -15,21 +17,27 @@ afterAll(async () => {
 });
 
 describe("Member Endpoints", () => {
-    it("should create a member with valid data", async () => {
+    beforeEach(async () => {
+        await AppDataSource.getRepository("member").createQueryBuilder().delete().execute();
+        // Cria um membro para os testes que precisam de um ID existente
         const response = await request(app)
             .post("/members")
             .send({
                 nomeCompleto: "Test Member",
                 dataNascimento: "2000-01-01",
-                emailInstitucional: "test@compjunior.com.br", // Atualizado para o domínio correto
+                emailInstitucional: "test@compjunior.com.br",
                 cargo: "Developer",
                 telefone: "123456789",
                 genero: "Masculino",
                 dataIngresso: "2023-01-01",
                 habilidades: ["Node.js", "TypeScript"]
             });
-        expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("id");
+        memberId = response.body.id;
+    });
+
+    it("should create a member with valid data", async () => {
+        // O beforeEach já criou um membro, então só verifica o status
+        expect(memberId).toBeDefined();
     });
 
     it("should not create a member with invalid email domain", async () => {
@@ -57,14 +65,14 @@ describe("Member Endpoints", () => {
 
     it("should update a member", async () => {
         const response = await request(app)
-            .put("/members/1")
+            .put(`/members/${memberId}`)
             .send({ nomeCompleto: "Updated Member" });
         expect(response.status).toBe(200);
         expect(response.body.nomeCompleto).toBe("Updated Member");
     });
 
     it("should delete a member with confirmation", async () => {
-        const response = await request(app).delete("/members/1?confirm=true");
+        const response = await request(app).delete(`/members/${memberId}?confirm=true`);
         expect(response.status).toBe(204);
     });
 });

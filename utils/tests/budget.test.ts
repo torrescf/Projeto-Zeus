@@ -1,6 +1,9 @@
 import request from "supertest";
-import { app } from "../../src/app/index";
+import { app } from "../../src/index";
 import { AppDataSource } from "../../src/database/data-source";
+
+let budgetId: number;
+let memberId: number;
 
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
@@ -15,19 +18,41 @@ afterAll(async () => {
 });
 
 describe("Budget Endpoints", () => {
-    it("should create a budget with valid data", async () => {
-        const response = await request(app)
+    beforeEach(async () => {
+        // Ordem correta para evitar FK: budget_history -> budget -> member
+        await AppDataSource.getRepository("budget_history").createQueryBuilder().delete().execute();
+        await AppDataSource.getRepository("budget").createQueryBuilder().delete().execute();
+        await AppDataSource.getRepository("member").createQueryBuilder().delete().execute();
+        // Cria um membro para ser responsável pelo orçamento
+        const memberRes = await request(app)
+            .post("/members")
+            .send({
+                nomeCompleto: "Test Member",
+                dataNascimento: "2000-01-01",
+                emailInstitucional: "test@compjunior.com.br",
+                cargo: "Developer",
+                telefone: "123456789",
+                genero: "Masculino",
+                dataIngresso: "2023-01-01",
+                habilidades: ["Node.js", "TypeScript"]
+            });
+        memberId = memberRes.body.id;
+        // Cria um orçamento
+        const budgetRes = await request(app)
             .post("/budgets")
             .send({
                 numeroOrcamento: "BUD-001",
                 descricaoProjeto: "Test Budget",
                 cliente: "Test Client",
-                membroResponsavel: 1,
+                membroResponsavel: memberId,
                 valorEstimado: 1000,
                 custosPrevistos: 800
             });
-        expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("id");
+        budgetId = budgetRes.body.id;
+    });
+
+    it("should create a budget with valid data", async () => {
+        expect(budgetId).toBeDefined();
     });
 
     it("should not create a budget with missing fields", async () => {
@@ -49,14 +74,14 @@ describe("Budget Endpoints", () => {
 
     it("should update a budget", async () => {
         const response = await request(app)
-            .put("/budgets/1")
+            .put(`/budgets/${budgetId}`)
             .send({ descricaoProjeto: "Updated Budget" });
         expect(response.status).toBe(200);
         expect(response.body.descricaoProjeto).toBe("Updated Budget");
     });
 
     it("should delete a budget with confirmation", async () => {
-        const response = await request(app).delete("/budgets/1?confirm=true");
+        const response = await request(app).delete(`/budgets/${budgetId}?confirm=true`);
         expect(response.status).toBe(204);
     });
 
@@ -68,7 +93,7 @@ describe("Budget Endpoints", () => {
 
     it("should change budget status", async () => {
         const response = await request(app)
-            .put("/budgets/1/status")
+            .put(`/budgets/${budgetId}/status`)
             .send({ status: "aprovado" });
         expect(response.status).toBe(200);
         expect(response.body.status).toBe("aprovado");

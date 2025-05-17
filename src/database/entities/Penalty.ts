@@ -4,7 +4,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Member } from "./Member";
 
-@Entity()
+@Entity('penalty')
 export class Penalty {
     @PrimaryGeneratedColumn()
     id: number;

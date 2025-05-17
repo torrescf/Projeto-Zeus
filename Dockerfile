@@ -6,11 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 
-# Copiar o script wait-for-it.sh para o contexto de build
-COPY wait-for-it.sh /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
-
-# Copiar código
+# Copiar código e scripts
 COPY . .
 
 # Build para produção

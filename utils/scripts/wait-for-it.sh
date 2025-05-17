@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/bin/sh
 # wait-for-it.sh
 #
 # Use this script to test if a given TCP host/port are available
@@ -19,12 +19,12 @@ fi
 HOSTPORT=$1
 shift
 
-if [[ $1 == --timeout=* ]]; then
+if [ "$1" != "" ] && echo "$1" | grep -q -- "^--timeout="; then
   TIMEOUT=${1#*=}
   shift
 fi
 
-if [[ $1 == -- ]]; then
+if [ "$1" = "--" ]; then
   shift
 fi
 

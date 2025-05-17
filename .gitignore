@@ -45,10 +45,12 @@ dist/
 # Insomnia export file
 Zeus_Insomnia.json
 
+# Postman collection file
+Zeus_Postman_Collection.json
+
 # Log files
 logfile
 index.js.map
 app.js.map
 coverage/
 logs/
-start-api.ps1

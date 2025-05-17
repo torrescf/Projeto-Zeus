@@ -8,6 +8,10 @@ import swaggerDocument from './swagger.json';
 import authRoutes from './routes/auth.routes';
 import memberRoutes from './routes/member.routes';
 import budgetRoutes from './routes/budget.routes';
+import clientRoutes from './routes/client.routes';
+import equipmentRoutes from './routes/equipment.routes';
+import penaltyRoutes from './routes/penalty.routes';
+import projectRoutes from './routes/project.routes';
 
 /**
  * Arquivo principal de configuração e inicialização do servidor Express.
@@ -32,6 +36,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth', authRoutes);
 app.use('/member', memberRoutes);
 app.use('/budget', budgetRoutes);
+app.use('/client', clientRoutes);
+app.use('/equipment', equipmentRoutes);
+app.use('/penalty', penaltyRoutes);
+app.use('/project', projectRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Rota de verificação de saúde

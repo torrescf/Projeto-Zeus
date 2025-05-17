@@ -6,7 +6,7 @@ import { Member } from "./Member";
 import { Client } from "./Client";
 import { BudgetHistory } from "./BudgetHistory";
 
-@Entity()
+@Entity('budget')
 export class Budget {
     @PrimaryGeneratedColumn()
     id: number;
