@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 export class InitialMigration1683900000000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            CREATE TABLE "members" (
+            CREATE TABLE IF NOT EXISTS "members" (
                 "id" SERIAL PRIMARY KEY,
                 "nomeCompleto" VARCHAR(100) NOT NULL,
                 "email" VARCHAR(100) UNIQUE NOT NULL,
@@ -20,14 +20,19 @@ export class InitialMigration1683900000000 implements MigrationInterface {
                 "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
-            CREATE TABLE "clients" (
+            CREATE TABLE IF NOT EXISTS "clients" (
                 "id" SERIAL PRIMARY KEY,
                 "name" VARCHAR(100) NOT NULL,
                 "email" VARCHAR(100) NOT NULL,
+                "phone" VARCHAR(50),
                 "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
-            CREATE TABLE "projects" (
+            -- Garante que a coluna password exista em clients
+            ALTER TABLE "clients"
+            ADD COLUMN IF NOT EXISTS "password" VARCHAR(255);
+
+            CREATE TABLE IF NOT EXISTS "projects" (
                 "id" SERIAL PRIMARY KEY,
                 "name" VARCHAR(100) NOT NULL,
                 "description" TEXT,
@@ -36,7 +41,7 @@ export class InitialMigration1683900000000 implements MigrationInterface {
                 FOREIGN KEY ("client_id") REFERENCES "clients"("id") ON DELETE CASCADE
             );
 
-            CREATE TABLE "budgets" (
+            CREATE TABLE IF NOT EXISTS "budgets" (
                 "id" SERIAL PRIMARY KEY,
                 "project_id" INT NOT NULL,
                 "amount" NUMERIC(15, 2) NOT NULL,

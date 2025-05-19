@@ -32,7 +32,12 @@ export const getMembers = async (req: Request, res: Response) => {
     try {
         const memberRepository = AppDataSource.getRepository(Member);
         const members = await memberRepository.find();
-        res.json(members);
+        // Remover o campo password do retorno
+        const membersWithoutPassword = members.map(member => {
+            const { password, ...rest } = member;
+            return rest;
+        });
+        res.json(membersWithoutPassword);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar membros', error });
     }

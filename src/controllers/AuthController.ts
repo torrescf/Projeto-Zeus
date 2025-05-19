@@ -31,6 +31,11 @@ const emailLimiter = rateLimit({
 
 export class AuthController {
     async register(req: Request, res: Response) {
+        // Se for registro de cliente, oriente a usar a rota correta
+        if (req.body.name) {
+            return res.status(400).json({ message: "Para registrar clientes, use /auth/register-client com name, email e password." });
+        }
+
         console.log('[AUTH] Register endpoint hit - Dados recebidos:', req.body);
         try {
             const { nomeCompleto, email, password, role, phone, gender, skills } = req.body;
@@ -54,7 +59,7 @@ export class AuthController {
                 isActive: true,
                 phone,
                 gender,
-                skills
+                skills: Array.isArray(skills) ? skills : (typeof skills === "string" ? skills.split(",") : []),
             });
             await memberRepository.save(newMember);
             console.log('[AUTH] Usuário criado com ID:', newMember.id);

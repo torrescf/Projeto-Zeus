@@ -1,11 +1,10 @@
 // Entidade que representa um projeto no banco de dados.
 // Relaciona-se com membros e clientes.
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTable } from "typeorm";
-import { Member } from "./Member";
-import { Client } from "./Client"; // Corrigido o caminho relativo
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Client } from "./Client";
 
-@Entity('project')
+@Entity('projects')
 export class Project {
     @PrimaryGeneratedColumn()
     id: number;
@@ -16,22 +15,11 @@ export class Project {
     @Column()
     description: string;
 
-    @Column()
-    status: string; // 'planning', 'in_progress', 'completed'
-
-    @Column({ type: "timestamp", nullable: true })
-    startDate: Date;
-
-    @Column({ type: "timestamp", nullable: true })
-    endDate: Date;
-
-    @ManyToOne(() => Member, member => member.ledProjects, { nullable: true })
-    membroResponsavel: Member;
-
-    @ManyToMany(() => Member, { nullable: true })
-    @JoinTable()
-    membrosEquipe: Member[];
-
-    @ManyToOne(() => Client, (client: Client) => client.projects, { nullable: true })
+    @ManyToOne(() => Client, { nullable: false })
+    // Corrija o nome da coluna para coincidir com o banco de dados
+    // Isso garante que o TypeORM use a coluna client_id
     client: Client;
+
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    created_at: Date;
 }

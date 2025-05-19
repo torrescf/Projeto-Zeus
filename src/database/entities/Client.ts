@@ -3,9 +3,8 @@
 
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Project } from "./Project";
-import { Budget } from "./Budget";
 
-@Entity('client')
+@Entity('clients')
 export class Client {
     @PrimaryGeneratedColumn()
     id: number;
@@ -19,9 +18,12 @@ export class Client {
     @Column({ nullable: true })
     phone: string;
 
+    @Column()
+    password: string;
+
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    created_at: Date;
+
     @OneToMany(() => Project, (project) => project.client)
     projects: Project[];
-
-    @OneToMany(() => Budget, (budget) => budget.cliente)
-    budgets: Budget[];
 }

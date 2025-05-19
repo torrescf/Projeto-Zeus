@@ -1,35 +1,29 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from "../database/data-source";
 import { Budget } from '../database/entities/Budget';
-import { Member } from '../database/entities/Member';
-import { sendBudgetStatusEmail } from "../services/Email/nodemailer";
+import { Project } from '../database/entities/Project';
 
 export const createBudget = async (req: Request, res: Response) => {
-    const { numeroOrcamento, descricaoProjeto, cliente, membroResponsavelId, valorEstimado, custosPrevistos } = req.body;
+    const { projectId, amount } = req.body;
 
     try {
-        if (!numeroOrcamento || !descricaoProjeto || !cliente || !membroResponsavelId || !valorEstimado || !custosPrevistos) {
-            return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos' });
+        if (!projectId || !amount) {
+            return res.status(400).json({ message: 'projectId e amount são obrigatórios' });
         }
 
-        const memberRepository = AppDataSource.getRepository(Member);
-        const membroResponsavel = await memberRepository.findOne({ where: { id: parseInt(membroResponsavelId) } });
-
-        if (!membroResponsavel) {
-            return res.status(404).json({ message: 'Membro responsável não encontrado' });
+        const projectRepository = AppDataSource.getRepository(Project);
+        const project = await projectRepository.findOne({ where: { id: parseInt(projectId) } });
+        if (!project) {
+            return res.status(404).json({ message: 'Projeto não encontrado' });
         }
 
         const budgetRepository = AppDataSource.getRepository(Budget);
 
         const newBudget = budgetRepository.create({
-            numeroOrcamento,
-            descricaoProjeto,
-            cliente,
-            membroResponsavel,
-            valorEstimado,
-            custosPrevistos,
-            dataCriacao: new Date(),
-            status: 'em_analise',
+            project,
+            amount,
+            created_at: new Date(),
+            updated_at: new Date(),
         });
 
         await budgetRepository.save(newBudget);
@@ -39,10 +33,12 @@ export const createBudget = async (req: Request, res: Response) => {
     }
 };
 
+export const createBudgetByClientId = createBudget;
+
 export const getBudgets = async (req: Request, res: Response) => {
     try {
         const budgetRepository = AppDataSource.getRepository(Budget);
-        const budgets = await budgetRepository.find();
+        const budgets = await budgetRepository.find({ relations: ["project"] });
         res.status(200).json(budgets);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar orçamentos', error });
@@ -54,7 +50,7 @@ export const getBudgetById = async (req: Request, res: Response) => {
 
     try {
         const budgetRepository = AppDataSource.getRepository(Budget);
-        const budget = await budgetRepository.findOne({ where: { id: parseInt(id) } });
+        const budget = await budgetRepository.findOne({ where: { id: parseInt(id) }, relations: ["project"] });
 
         if (!budget) return res.status(404).json({ message: 'Orçamento não encontrado' });
 
@@ -66,7 +62,7 @@ export const getBudgetById = async (req: Request, res: Response) => {
 
 export const updateBudget = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { numeroOrcamento, descricaoProjeto, cliente, membroResponsavelId, valorEstimado, custosPrevistos } = req.body;
+    const { projectId, amount } = req.body;
 
     try {
         const budgetRepository = AppDataSource.getRepository(Budget);
@@ -74,7 +70,17 @@ export const updateBudget = async (req: Request, res: Response) => {
 
         if (!budget) return res.status(404).json({ message: 'Orçamento não encontrado' });
 
-        Object.assign(budget, { numeroOrcamento, descricaoProjeto, cliente, valorEstimado, custosPrevistos });
+        if (projectId) {
+            const projectRepository = AppDataSource.getRepository(Project);
+            const project = await projectRepository.findOne({ where: { id: parseInt(projectId) } });
+            if (!project) {
+                return res.status(404).json({ message: 'Projeto não encontrado' });
+            }
+            budget.project = project;
+        }
+        if (amount) budget.amount = amount;
+        budget.updated_at = new Date();
+
         await budgetRepository.save(budget);
 
         res.status(200).json(budget);
@@ -100,49 +106,5 @@ export const deleteBudget = async (req: Request, res: Response) => {
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Erro ao excluir orçamento', error });
-    }
-};
-
-export const changeBudgetStatus = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    try {
-        const budgetRepository = AppDataSource.getRepository(Budget);
-        const budget = await budgetRepository.findOne({ where: { id: parseInt(id) } });
-
-        if (!budget) return res.status(404).json({ message: 'Orçamento não encontrado' });
-
-        const previousStatus = budget.status;
-        budget.status = status;
-        await budgetRepository.save(budget);
-
-        // Envia e-mail de notificação de alteração de status
-        try {
-            await sendBudgetStatusEmail(budget, previousStatus);
-        } catch (emailError) {
-            // Loga erro, mas não impede resposta principal
-            console.error('Erro ao enviar e-mail de status do orçamento:', emailError);
-        }
-
-        res.status(200).json(budget);
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao alterar status do orçamento', error });
-    }
-};
-
-export const getBudgetsByUser = async (req: Request, res: Response) => {
-    const userId = req.userId;
-
-    try {
-        const budgetRepository = AppDataSource.getRepository(Budget);
-        const budgets = await budgetRepository.find({
-            where: { membroResponsavel: { id: userId } },
-            relations: ["membroResponsavel"]
-        });
-
-        res.status(200).json(budgets);
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao buscar orçamentos do usuário', error });
     }
 };

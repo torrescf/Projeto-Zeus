@@ -12,6 +12,7 @@ import clientRoutes from './routes/client.routes';
 import equipmentRoutes from './routes/equipment.routes';
 import penaltyRoutes from './routes/penalty.routes';
 import projectRoutes from './routes/project.routes';
+import { createBudgetByClientId } from '../controllers/BudgetController';
 
 /**
  * Arquivo principal de configuração e inicialização do servidor Express.
@@ -33,14 +34,20 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Rotas
+// Remova ou comente esta linha se quiser as rotas públicas de client na raiz:
+// app.use('/client', clientRoutes);
+
+// Adicione esta linha para expor as rotas de client na raiz (incluindo /delete/clients/:id):
+app.use(clientRoutes);
 app.use('/auth', authRoutes);
-app.use('/member', memberRoutes);
-app.use('/budget', budgetRoutes);
-app.use('/client', clientRoutes);
+app.use(memberRoutes);
+// Adicione esta linha para expor as rotas de budget na raiz (incluindo /budgets):
+app.use(budgetRoutes);
 app.use('/equipment', equipmentRoutes);
 app.use('/penalty', penaltyRoutes);
 app.use('/project', projectRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.post('/budgets-create', createBudgetByClientId);
 
 // Rota de verificação de saúde
 app.get('/healthcheck', (req: Request, res: Response) => {

@@ -27,7 +27,7 @@ try {
 
 # Verificar se a compilação do TypeScript gerou os arquivos esperados
 Write-Host "Verificando arquivos compilados..."
-if (-Not (Test-Path -Path "dist/index.js")) {
+if (!(Test-Path -Path "dist/index.js")) {
     Write-Host "Erro: Arquivo dist/index.js não encontrado. Verifique a etapa de compilação."
     exit 1
 }

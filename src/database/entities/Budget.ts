@@ -1,41 +1,23 @@
 // Entidade que representa um orçamento no banco de dados.
 // Relaciona-se com membros, clientes e histórico de alterações.
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
-import { Member } from "./Member";
-import { Client } from "./Client";
-import { BudgetHistory } from "./BudgetHistory";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Project } from "./Project";
 
-@Entity('budget')
+@Entity('budgets') // Corrigido para o nome correto da tabela
 export class Budget {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    numeroOrcamento: string;
+    @ManyToOne(() => Project, { nullable: false })
+    project: Project;
 
-    @Column()
-    descricaoProjeto: string;
-
-    // Relacionamento com o cliente
-    @ManyToOne(() => Client, { nullable: false })
-    cliente: Client;
-
-    @ManyToOne(() => Member, (member) => member.budgets, { nullable: true })
-    membroResponsavel: Member;
-
-    @Column("decimal", { precision: 10, scale: 2 })
-    valorEstimado: number;
-
-    @Column("decimal", { precision: 10, scale: 2 })
-    custosPrevistos: number;
+    @Column("decimal", { precision: 15, scale: 2 })
+    amount: number;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    dataCriacao: Date;
+    created_at: Date;
 
-    @Column()
-    status: string;
-
-    @OneToMany(() => BudgetHistory, (history) => history.budget, { cascade: true })
-    historicoAlteracoes: BudgetHistory[];
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    updated_at: Date;
 }

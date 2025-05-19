@@ -41,10 +41,12 @@ CREATE TABLE IF NOT EXISTS clients (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de projetos (exemplo de relacionamento)
+-- Tabela de projetos
 CREATE TABLE IF NOT EXISTS projects (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -57,11 +59,16 @@ CREATE TABLE IF NOT EXISTS projects (
 -- Tabela de orçamentos (budgets)
 CREATE TABLE IF NOT EXISTS budgets (
     id SERIAL PRIMARY KEY,
-    project_id INT NOT NULL,
-    amount NUMERIC(15, 2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
+    numeroOrcamento VARCHAR(100) NOT NULL,
+    descricaoProjeto TEXT NOT NULL,
+    valorEstimado NUMERIC(15, 2) NOT NULL,
+    custosPrevistos NUMERIC(15, 2) NOT NULL,
+    dataCriacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) NOT NULL,
+    clienteId INT NOT NULL,
+    membroResponsavelId INT,
+    FOREIGN KEY (clienteId) REFERENCES clients (id) ON DELETE CASCADE,
+    FOREIGN KEY (membroResponsavelId) REFERENCES members (id) ON DELETE SET NULL
 );
 
 -- Índices para melhorar a performance

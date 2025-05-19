@@ -18,7 +18,7 @@ export class BudgetHistory {
     @Column('jsonb')
     newData: Record<string, any>;
 
-    @ManyToOne(() => Budget, (budget) => budget.historicoAlteracoes)
+    @ManyToOne(() => Budget, (budget) => budget.updated_at)
     budget: Budget;
 
     @ManyToOne(() => Member)

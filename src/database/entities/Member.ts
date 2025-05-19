@@ -3,8 +3,6 @@
 
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { IsEmail, Matches } from "class-validator";
-import { Budget } from "./Budget";
-import { Project } from "./Project";
 import { Penalty } from "./Penalty";
 
 @Entity('members')
@@ -37,7 +35,7 @@ export class Member {
     @Column({ type: "timestamp", nullable: true })
     resetPasswordExpires: Date;
 
-    @Column("simple-array", { nullable: true })
+    @Column("text", { array: true, nullable: true })
     skills: string[];
 
     @Column({ nullable: true })
@@ -51,12 +49,6 @@ export class Member {
 
     @Column({ nullable: true })
     resetToken?: string;
-
-    @OneToMany(() => Budget, (budget) => budget.membroResponsavel)
-    budgets: Budget[];
-
-    @OneToMany(() => Project, (project) => project.membroResponsavel)
-    ledProjects: Project[];
 
     @OneToMany(() => Penalty, (penalty) => penalty.member)
     penalties: Penalty[];

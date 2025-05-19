@@ -3,8 +3,38 @@ import { createMember, getMembers, getMemberById, updateMember, deleteMember } f
 import { isAdmin } from '../../middlewares/authMiddleware';
 import { uploadPhoto } from '../../middlewares/uploadMiddleware';
 import { check } from 'express-validator';
+import { AppDataSource } from "../../database/data-source";
+import { Member } from "../../database/entities/Member";
 
 const router = express.Router();
+
+// Rota pública para listar todos os membros (deve vir antes das rotas com parâmetros)
+router.get('/list/members', async (req, res) => {
+    try {
+        await getMembers(req, res);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao listar membros', error });
+    }
+});
+
+// Rota pública para deletar membro por ID
+router.delete('/members-delete/:id', async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+        return res.status(400).json({ message: 'ID inválido. Use apenas números, exemplo: /members-delete/1' });
+    }
+    try {
+        const memberRepository = AppDataSource.getRepository(Member);
+        const result = await memberRepository.delete(id);
+        if (result.affected && result.affected > 0) {
+            return res.status(204).send();
+        } else {
+            return res.status(404).json({ message: 'Membro não encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao deletar membro', error: error instanceof Error ? error.message : error });
+    }
+});
 
 // CRUD de membros
 router.post(
