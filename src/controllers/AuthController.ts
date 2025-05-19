@@ -6,10 +6,10 @@ import { AppDataSource } from "../database/data-source";
 import { Member } from "../database/entities/Member";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import { addHours } from "date-fns";
+import { sendPasswordResetEmail } from "../services/Email/nodemailer";
 
 // Limitação de tentativas de login
 const loginLimiter = rateLimit({
@@ -35,7 +35,6 @@ export class AuthController {
         try {
             const { nomeCompleto, email, password, role, phone, gender, skills } = req.body;
             if (!nomeCompleto || !email || !password) {
-                console.log('[AUTH] Falha na validação: Dados incompletos');
                 return res.status(400).json({ message: "nomeCompleto, email e password são obrigatórios" });
             }
             const memberRepository = AppDataSource.getRepository(Member);
@@ -122,16 +121,7 @@ export class AuthController {
             member.resetPasswordExpires = addHours(new Date(), 1); // Expira em 1 hora
             await memberRepository.save(member);
 
-            const transporter = nodemailer.createTransport({
-                service: 'Gmail',
-                auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-            });
-
-            await transporter.sendMail({
-                to: email,
-                subject: 'Redefinição de Senha',
-                html: `<a href="${process.env.APP_URL}/reset-password?token=${token}">Clique aqui para redefinir sua senha</a>`
-            });
+            await sendPasswordResetEmail(email, token);
 
             res.json({ message: 'E-mail de redefinição enviado' });
         } catch (error) {

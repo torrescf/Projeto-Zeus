@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from "../database/data-source";
 import { Budget } from '../database/entities/Budget';
 import { Member } from '../database/entities/Member';
+import { sendBudgetStatusEmail } from "../services/Email/nodemailer";
 
 export const createBudget = async (req: Request, res: Response) => {
     const { numeroOrcamento, descricaoProjeto, cliente, membroResponsavelId, valorEstimado, custosPrevistos } = req.body;
@@ -112,8 +113,17 @@ export const changeBudgetStatus = async (req: Request, res: Response) => {
 
         if (!budget) return res.status(404).json({ message: 'Orçamento não encontrado' });
 
+        const previousStatus = budget.status;
         budget.status = status;
         await budgetRepository.save(budget);
+
+        // Envia e-mail de notificação de alteração de status
+        try {
+            await sendBudgetStatusEmail(budget, previousStatus);
+        } catch (emailError) {
+            // Loga erro, mas não impede resposta principal
+            console.error('Erro ao enviar e-mail de status do orçamento:', emailError);
+        }
 
         res.status(200).json(budget);
     } catch (error) {

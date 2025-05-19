@@ -41,12 +41,12 @@ const isMigrationContext = process.argv.some(arg => arg.includes('typeorm'));
 let env;
 if (!isMigrationContext) {
     env = cleanEnv(process.env, {
-        FRONTEND_URL: url({ desc: 'URL do frontend', default: 'http://db:5173' }),
+        FRONTEND_URL: url({ desc: 'URL do frontend', default: 'http://localhost:5173' }),
         PORT: port({ default: 4001, desc: 'Porta do servidor' }),
         DATABASE_URL: str({ desc: 'URL de conexão com o banco de dados', default: 'postgres://postgres:147afj@db:5432/zeus_admin' }),
         EMAIL_USER: str({ desc: 'Usuário do email', default: 'default@example.com' }),
         EMAIL_PASS: str({ desc: 'Senha do email', default: 'password' }),
-        APP_URL: url({ desc: 'URL da aplicação', default: 'http://db:4001' }),
+        APP_URL: url({ desc: 'URL da aplicação', default: 'http://localhost:4001' }),
         JWT_SECRET: str({ desc: 'Segredo para tokens JWT', default: 'sua_chave_secreta_forte_aqui' }),
         NODE_ENV: str({ choices: ['development', 'production', 'test'], default: 'development', desc: 'Ambiente de execução' }),
         DB_HOST: str({ desc: 'Host do banco de dados', default: 'db' }),
@@ -62,7 +62,7 @@ console.log("Iniciando a configuração do AppDataSource...");
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: process.env.DB_HOST || "db",
+    host: process.env.DB_HOST || "localhost",
     port: parseInt(process.env.DB_PORT || "5432"),
     username: process.env.DB_USER || "postgres",
     password: process.env.DB_PASSWORD || "147afj",

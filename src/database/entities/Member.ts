@@ -7,7 +7,7 @@ import { Budget } from "./Budget";
 import { Project } from "./Project";
 import { Penalty } from "./Penalty";
 
-@Entity('member')
+@Entity('members')
 export class Member {
     @PrimaryGeneratedColumn()
     id: number;

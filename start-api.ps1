@@ -49,6 +49,7 @@ Start-Sleep -Seconds 30
 Write-Host "Inicializando o banco de dados..."
 try {
     docker exec zeus_api npx ts-node ./node_modules/typeorm/cli.js migration:run -d src/database/data-source.ts
+    npx ts-node ./node_modules/typeorm/cli.js migration:run -d src/database/data-source.ts
 } catch {
     Write-Host "Erro ao executar migrações do TypeORM. Verifique as variáveis de ambiente e o arquivo de configuração."
     exit 1
