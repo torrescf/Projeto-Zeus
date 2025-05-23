@@ -12,6 +12,7 @@ import equipmentRoutes from './routes/equipment.routes';
 import penaltyRoutes from './routes/penalty.routes';
 import projectRoutes from './routes/project.routes';
 import { createBudgetByClientId } from '../controllers/BudgetController';
+import path from 'path';
 
 /**
  * Arquivo principal de configuração e inicialização do servidor Express.
@@ -34,6 +35,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // Swagger deve vir antes das rotas dinâmicas
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Servir arquivos estáticos do front-end
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Fallback para SPA (deve vir após as rotas da API, mas antes do 404)
+app.get('/', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Rotas agrupadas por prefixo para melhor organização no Swagger
 app.use('/client', clientRoutes);

@@ -252,8 +252,10 @@
     <div class="container">
         <div class="tabs">
             <div class="tab active" data-tab="login">Login</div>
-            <div class="tab" data-tab="member">Membros</div>
+            <div class="tab" data-tab="register">Cadastro</div>   
             <div class="tab" data-tab="project">Projetos</div>
+            <div class="tab" data-tab="equipment">Equipamentos</div>
+            <div class="tab" data-tab="penalty">Penalidades</div>
             <div class="tab" data-tab="password">Recuperação de Senha</div>
         </div>
 
@@ -276,6 +278,43 @@
                 <div class="response-area" id="loginResponse" style="display: none;">
                     <h3><i class="fas fa-server"></i> Resposta:</h3>
                     <div id="loginResponseContent"></div>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div class="card tab-content" id="register-tab">
+                <h2><i class="fas fa-user-plus"></i> Registrar Usuário</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName"><i class="fas fa-user"></i> Nome:</label>
+                        <input type="text" id="registerName" class="form-control" required placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail"><i class="fas fa-envelope"></i> Email:</label>
+                        <input type="email" id="registerEmail" class="form-control" required placeholder="usuario@empresa.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword"><i class="fas fa-lock"></i> Senha:</label>
+                        <input type="password" id="registerPassword" class="form-control" required placeholder="Senha">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone"><i class="fas fa-phone"></i> Telefone:</label>
+                        <input type="text" id="registerPhone" class="form-control" required placeholder="(99) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerRole"><i class="fas fa-user-tag"></i> Função:</label>
+                        <select id="registerRole" class="form-control">
+                            <option value="client">Cliente</option>
+                            <option value="member">Membro</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Registrar</button>
+                </form>
+
+                <div class="response-area" id="registerResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="registerResponseContent"></div>
                 </div>
             </div>
 
@@ -307,6 +346,35 @@
                 </div>
             </div>
 
+            <!-- Client Registration Form -->
+            <div class="card tab-content" id="client-tab">
+                <h2><i class="fas fa-building"></i> Registrar Cliente</h2>
+                <form id="clientForm">
+                    <div class="form-group">
+                        <label for="clientName"><i class="fas fa-user"></i> Nome:</label>
+                        <input type="text" id="clientName" class="form-control" required placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail"><i class="fas fa-envelope"></i> Email:</label>
+                        <input type="email" id="clientEmail" class="form-control" required placeholder="cliente@empresa.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone"><i class="fas fa-phone"></i> Telefone:</label>
+                        <input type="text" id="clientPhone" class="form-control" required placeholder="(99) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientAddress"><i class="fas fa-map-marker-alt"></i> Endereço:</label>
+                        <input type="text" id="clientAddress" class="form-control" required placeholder="Endereço completo">
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Registrar Cliente</button>
+                </form>
+
+                <div class="response-area" id="clientResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="clientResponseContent"></div>
+                </div>
+            </div>
+
             <!-- Project Creation Form (substitui orçamento) -->
             <div class="card tab-content" id="project-tab">
                 <h2><i class="fas fa-folder-plus"></i> Criar Projeto</h2>
@@ -333,6 +401,64 @@
                 <div class="response-area" id="projectResponse" style="display: none;">
                     <h3><i class="fas fa-server"></i> Resposta:</h3>
                     <div id="projectResponseContent"></div>
+                </div>
+            </div>
+
+            <!-- Equipment Registration Form -->
+            <div class="card tab-content" id="equipment-tab">
+                <h2><i class="fas fa-tools"></i> Registrar Equipamento</h2>
+                <form id="equipmentForm">
+                    <div class="form-group">
+                        <label for="equipmentName"><i class="fas fa-tag"></i> Nome do Equipamento:</label>
+                        <input type="text" id="equipmentName" class="form-control" required placeholder="Nome do equipamento">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentType"><i class="fas fa-cogs"></i> Tipo:</label>
+                        <input type="text" id="equipmentType" class="form-control" required placeholder="Tipo de equipamento">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentBrand"><i class="fas fa-industry"></i> Marca:</label>
+                        <input type="text" id="equipmentBrand" class="form-control" required placeholder="Marca do equipamento">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentModel"><i class="fas fa-model"></i> Modelo:</label>
+                        <input type="text" id="equipmentModel" class="form-control" required placeholder="Modelo do equipamento">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipmentSerial"><i class="fas fa-barcode"></i> Número de Série:</label>
+                        <input type="text" id="equipmentSerial" class="form-control" required placeholder="Número de série">
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Registrar Equipamento</button>
+                </form>
+
+                <div class="response-area" id="equipmentResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="equipmentResponseContent"></div>
+                </div>
+            </div>
+
+            <!-- Penalty Registration Form -->
+            <div class="card tab-content" id="penalty-tab">
+                <h2><i class="fas fa-ban"></i> Registrar Penalidade</h2>
+                <form id="penaltyForm">
+                    <div class="form-group">
+                        <label for="penaltyDescription"><i class="fas fa-align-left"></i> Descrição:</label>
+                        <input type="text" id="penaltyDescription" class="form-control" required placeholder="Descrição da penalidade">
+                    </div>
+                    <div class="form-group">
+                        <label for="penaltyAmount"><i class="fas fa-money-bill-wave"></i> Valor:</label>
+                        <input type="number" id="penaltyAmount" class="form-control" required placeholder="100.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="penaltyClientId"><i class="fas fa-id-card"></i> ID do Cliente:</label>
+                        <input type="number" id="penaltyClientId" class="form-control" required placeholder="123">
+                    </div>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-ban"></i> Registrar Penalidade</button>
+                </form>
+
+                <div class="response-area" id="penaltyResponse" style="display: none;">
+                    <h3><i class="fas fa-server"></i> Resposta:</h3>
+                    <div id="penaltyResponseContent"></div>
                 </div>
             </div>
 
@@ -375,7 +501,7 @@
 
     <footer>
         <div class="container">
-            <p>Zeus API Interface &copy; 2023 - Todos os direitos reservados</p>
+            <p>Zeus API Interface &copy; 2025 - Todos os direitos reservados @CompJr</p>
         </div>
     </footer>
 
@@ -396,25 +522,33 @@
 
         // Tab functionality
         document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and content
+            tab.addEventListener('click', function() {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab and corresponding content
                 tab.classList.add('active');
-                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                const content = document.getElementById(tabId + '-tab');
+                if (content) content.classList.add('active');
             });
         });
 
-        // Login Form Submission
-        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        // Garante que a primeira aba e conteúdo estejam ativos ao carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab');
+            const firstContent = document.querySelector('.tab-content');
+            if (firstTab) firstTab.classList.add('active');
+            if (firstContent) firstContent.classList.add('active');
+        });
+
+        // Corrige envio dos formulários: garante que todos inputs existam e pega os valores corretamente
+        // Exemplo para o login (repita para os outros se necessário)
+        document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+            const email = document.getElementById("email")?.value;
+            const password = document.getElementById("password")?.value;
             const responseArea = document.getElementById("loginResponse");
             const contentArea = document.getElementById("loginResponseContent");
-
+            if (!email || !password) return;
             try {
                 const response = await fetch(`${API_URL}/auth/login`, {
                     method: "POST",
@@ -422,27 +556,44 @@
                     body: JSON.stringify({ email, password }),
                 });
                 const data = await response.json();
-                
                 if (data.token) {
                     authToken = data.token;
-                    contentArea.innerHTML = `
-                        <p><strong>Status:</strong> Sucesso!</p>
-                        <p><strong>Token:</strong></p>
-                        <div class="token-display">${data.token}</div>
-                    `;
+                    contentArea.innerHTML = `<p><strong>Status:</strong> Sucesso!</p><p><strong>Token:</strong></p><div class="token-display">${data.token}</div>`;
                 } else {
-                    contentArea.innerHTML = `
-                        <p><strong>Status:</strong> Erro</p>
-                        <p><strong>Mensagem:</strong> ${data.message || 'Credenciais inválidas'}</p>
-                    `;
+                    contentArea.innerHTML = `<p><strong>Status:</strong> Erro</p><p><strong>Mensagem:</strong> ${data.message || 'Credenciais inválidas'}</p>`;
                 }
                 responseArea.style.display = 'block';
             } catch (error) {
-                console.error("Error:", error);
-                contentArea.innerHTML = `
-                    <p><strong>Status:</strong> Erro</p>
-                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
-                `;
+                contentArea.innerHTML = `<p><strong>Status:</strong> Erro</p><p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>`;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Register Form Submission
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const name = document.getElementById("registerName").value;
+            const email = document.getElementById("registerEmail").value;
+            const password = document.getElementById("registerPassword").value;
+            const phone = document.getElementById("registerPhone").value;
+            const role = document.getElementById("registerRole").value;
+            const responseArea = document.getElementById("registerResponse");
+            const contentArea = document.getElementById("registerResponseContent");
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password, phone, role })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    contentArea.innerHTML = `<p><strong>Status:</strong> Sucesso!</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    contentArea.innerHTML = `<p><strong>Status:</strong> Erro</p><p><strong>Mensagem:</strong> ${data.message || 'Falha ao registrar usuário'}</p>`;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                contentArea.innerHTML = `<p><strong>Status:</strong> Erro</p><p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>`;
                 responseArea.style.display = 'block';
             }
         });
@@ -499,6 +650,59 @@
             }
         });
 
+        // Client Registration Form Submission
+        document.getElementById("clientForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const name = document.getElementById("clientName").value;
+            const email = document.getElementById("clientEmail").value;
+            const phone = document.getElementById("clientPhone").value;
+            const address = document.getElementById("clientAddress").value;
+            const responseArea = document.getElementById("clientResponse");
+            const contentArea = document.getElementById("clientResponseContent");
+
+            if (!authToken) {
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Você precisa fazer login primeiro</p>
+                `;
+                responseArea.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/client`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ name, email, phone, address }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Cliente registrado com sucesso!'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao registrar cliente'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
         // Project Creation Form Submission (substitui orçamento)
         document.getElementById("projectForm").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -539,6 +743,112 @@
                     contentArea.innerHTML = `
                         <p><strong>Status:</strong> Erro</p>
                         <p><strong>Mensagem:</strong> ${data.message || 'Falha ao criar projeto'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Equipment Registration Form Submission
+        document.getElementById("equipmentForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const name = document.getElementById("equipmentName").value;
+            const type = document.getElementById("equipmentType").value;
+            const brand = document.getElementById("equipmentBrand").value;
+            const model = document.getElementById("equipmentModel").value;
+            const serial = document.getElementById("equipmentSerial").value;
+            const responseArea = document.getElementById("equipmentResponse");
+            const contentArea = document.getElementById("equipmentResponseContent");
+
+            if (!authToken) {
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Você precisa fazer login primeiro</p>
+                `;
+                responseArea.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/equipment`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ name, type, brand, model, serial }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Equipamento registrado com sucesso!'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao registrar equipamento'}</p>
+                    `;
+                }
+                responseArea.style.display = 'block';
+            } catch (error) {
+                console.error("Error:", error);
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Falha na conexão com o servidor</p>
+                `;
+                responseArea.style.display = 'block';
+            }
+        });
+
+        // Penalty Registration Form Submission
+        document.getElementById("penaltyForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const description = document.getElementById("penaltyDescription").value;
+            const amount = document.getElementById("penaltyAmount").value;
+            const client_id = document.getElementById("penaltyClientId").value;
+            const responseArea = document.getElementById("penaltyResponse");
+            const contentArea = document.getElementById("penaltyResponseContent");
+
+            if (!authToken) {
+                contentArea.innerHTML = `
+                    <p><strong>Status:</strong> Erro</p>
+                    <p><strong>Mensagem:</strong> Você precisa fazer login primeiro</p>
+                `;
+                responseArea.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/penalty`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ description, amount, client_id }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Sucesso!</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Penalidade registrada com sucesso!'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <p><strong>Status:</strong> Erro</p>
+                        <p><strong>Mensagem:</strong> ${data.message || 'Falha ao registrar penalidade'}</p>
                     `;
                 }
                 responseArea.style.display = 'block';

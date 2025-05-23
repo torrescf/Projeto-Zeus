@@ -8,6 +8,8 @@ process.on('unhandledRejection', (reason, promise) => {
 
 import { app } from './app/app';
 import { AppDataSource } from './database/data-source';
+import path from "path";
+import express from "express";
 
 const port = process.env.PORT || 3333;
 
@@ -23,5 +25,13 @@ AppDataSource.initialize()
     .catch((error) => {
         console.error('[FATAL] Falha na inicialização:', error);
     });
+
+// Servir arquivos estáticos do front-end (public)
+app.use(express.static(path.join(__dirname, "app", "public")));
+
+// Rota fallback para SPA (opcional, se usar React/Vue/Angular)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "app", "public", "index.html"));
+});
 
 export { app };

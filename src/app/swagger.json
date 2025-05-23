@@ -20,29 +20,11 @@
         },
         "/auth/register": {
             "post": {
-                "summary": "Registrar novo membro",
+                "summary": "Registrar novo usuário (membro ou cliente)",
                 "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "nomeCompleto": { "type": "string" }, "email": { "type": "string" }, "password": { "type": "string" }, "role": { "type": "string" }, "phone": { "type": "string" } }, "required": ["nomeCompleto", "email", "password", "role", "phone"] } }
+                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "nomeCompleto": { "type": "string" }, "email": { "type": "string" }, "password": { "type": "string" }, "role": { "type": "string" }, "phone": { "type": "string" } } } }
                 ],
-                "responses": { "201": { "description": "Membro criado" }, "400": { "description": "Dados inválidos ou email já em uso" } }
-            }
-        },
-        "/auth/register-client": {
-            "post": {
-                "summary": "Registrar novo cliente",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/ClientRegister" } }
-                ],
-                "responses": { "201": { "description": "Cliente criado" }, "400": { "description": "Dados inválidos ou email já em uso" } }
-            }
-        },
-        "/auth/forgot-password": {
-            "post": {
-                "summary": "Solicitar redefinição de senha",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "email": { "type": "string" } }, "required": ["email"] } }
-                ],
-                "responses": { "200": { "description": "E-mail de redefinição enviado" }, "404": { "description": "Usuário não encontrado" } }
+                "responses": { "201": { "description": "Usuário criado" }, "400": { "description": "Dados inválidos ou email já em uso" } }
             }
         },
         "/auth/reset-password/{token}": {
@@ -55,6 +37,15 @@
                 "responses": { "200": { "description": "Senha redefinida com sucesso" }, "400": { "description": "Token inválido ou expirado" } }
             }
         },
+        "/auth/forgot-password": {
+            "post": {
+                "summary": "Solicitar redefinição de senha",
+                "parameters": [
+                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "email": { "type": "string" } }, "required": ["email"] } }
+                ],
+                "responses": { "200": { "description": "E-mail de redefinição enviado" }, "404": { "description": "Usuário não encontrado" } }
+            }
+        },
         "/member": {
             "post": {
                 "summary": "Criar membro",
@@ -62,6 +53,16 @@
                     { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "nomeCompleto": { "type": "string" }, "email": { "type": "string" }, "password": { "type": "string" }, "role": { "type": "string" }, "phone": { "type": "string" } }, "required": ["nomeCompleto", "email", "password", "role", "phone"] } }
                 ],
                 "responses": { "201": { "description": "Membro criado" }, "400": { "description": "Dados inválidos" } }
+            },
+            "get": {
+                "summary": "Listar todos os membros",
+                "responses": { "200": { "description": "Lista de membros" } }
+            }
+        },
+        "/list/members": {
+            "get": {
+                "summary": "Listar todos os membros (rota alternativa)",
+                "responses": { "200": { "description": "Lista de membros" } }
             }
         },
         "/member/{id}": {
@@ -125,22 +126,27 @@
         "/client/upload-photo/{id}": {
             "post": {
                 "summary": "Upload de foto de perfil do cliente",
-                "description": "Envia uma foto de perfil para o Cloudinary e salva a URL no cliente.",
+                "description": "Envia uma foto de perfil para o Cloudinary e salva a URL no cliente. Requer autenticação Bearer.",
                 "consumes": ["multipart/form-data"],
                 "parameters": [
+                    { "name": "Authorization", "in": "header", "required": true, "type": "string", "description": "Bearer <token>" },
                     { "name": "id", "in": "path", "required": true, "type": "integer" },
                     { "name": "photo", "in": "formData", "required": true, "type": "file" }
                 ],
-                "responses": { "200": { "description": "Upload realizado com sucesso" }, "400": { "description": "Nenhuma imagem enviada" }, "500": { "description": "Erro ao enviar imagem para o Cloudinary" } }
+                "responses": { "200": { "description": "Upload realizado com sucesso" }, "400": { "description": "Nenhuma imagem enviada" }, "401": { "description": "Token ausente ou inválido" }, "500": { "description": "Erro ao enviar imagem para o Cloudinary" } }
             }
         },
         "/project": {
             "post": {
                 "summary": "Criar projeto",
                 "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/ProjectCreate" } }
+                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" }, "clientId": { "type": "integer" }, "memberId": { "type": "integer" } }, "required": ["name", "description", "clientId", "memberId"] } }
                 ],
                 "responses": { "201": { "description": "Projeto criado" }, "400": { "description": "Dados inválidos" }, "404": { "description": "Cliente não encontrado" } }
+            },
+            "get": {
+                "summary": "Listar todos os projetos",
+                "responses": { "200": { "description": "Lista de projetos" } }
             }
         },
         "/project/{id}": {
@@ -267,11 +273,12 @@
         },
         "ProjectCreate": {
             "type": "object",
-            "required": ["name", "description", "clientId"],
+            "required": ["name", "description", "clientId", "memberId"],
             "properties": {
                 "name": { "type": "string" },
                 "description": { "type": "string" },
-                "clientId": { "type": "integer" }
+                "clientId": { "type": "integer" },
+                "memberId": { "type": "integer" }
             }
         }
     }
