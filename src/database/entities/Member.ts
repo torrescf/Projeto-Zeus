@@ -1,16 +1,17 @@
 // Entidade que representa um membro no banco de dados.
 // Inclui informações pessoais, permissões e relacionamentos.
 
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from "typeorm";
 import { IsEmail, Matches } from "class-validator";
 import { Penalty } from "./Penalty";
+import { Project } from "./Project";
 
 @Entity('members')
 export class Member {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-    @Column()
+    @Column({ name: 'nomeCompleto', default: () => `'Guest_' || substring(md5(random()::text), 1, 8)` })
     nomeCompleto: string;
 
     @Column({ unique: true })
@@ -29,17 +30,11 @@ export class Member {
     @Column({ default: false })
     isActive: boolean;
 
-    @Column({ nullable: true })
-    resetPasswordToken: string;
-
-    @Column({ type: "timestamp", nullable: true })
-    resetPasswordExpires: Date;
-
     @Column("text", { array: true, nullable: true })
     skills: string[];
 
     @Column({ nullable: true })
-    gender: "male" | "female" | "other";
+    gender: string;
 
     @Column({ nullable: true })
     phone: string;
@@ -47,9 +42,18 @@ export class Member {
     @Column({ nullable: true })
     photo: string;
 
-    @Column({ nullable: true })
-    resetToken?: string;
+    @Column({ name: 'resetPasswordToken', nullable: true })
+    resetPasswordToken: string;
+
+    @Column({ type: "timestamp", name: 'resetPasswordExpires', nullable: true })
+    resetPasswordExpires: Date;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
 
     @OneToMany(() => Penalty, (penalty) => penalty.member)
     penalties: Penalty[];
+
+    @OneToMany(() => Project, (project) => project.client)
+    projects: Project[];
 }

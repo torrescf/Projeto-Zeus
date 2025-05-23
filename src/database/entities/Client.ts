@@ -24,6 +24,15 @@ export class Client {
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     created_at: Date;
 
+    @Column({ name: 'resetpasswordtoken', nullable: true })
+    resetPasswordToken: string;
+
+    @Column({ name: 'resetpasswordexpires', type: "timestamp", nullable: true })
+    resetPasswordExpires: Date;
+
+    @Column({ nullable: true })
+    photoUrl: string;
+
     @OneToMany(() => Project, (project) => project.client)
     projects: Project[];
 }

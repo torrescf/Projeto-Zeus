@@ -3,15 +3,16 @@ import { AppDataSource } from "../database/data-source";
 import { Member } from '../database/entities/Member';
 
 export const createMember = async (req: Request, res: Response) => {
-    const { nomeCompleto, email, password, role, phone, gender, skills } = req.body;
+    const { nomeCompleto, name, email, password, role, phone, gender, skills } = req.body;
     const photo = req.file?.path;
     try {
         if (!email.endsWith('@compjunior.com.br')) {
             return res.status(400).json({ message: 'O email deve pertencer ao domínio compjunior.com.br' });
         }
         const memberRepository = AppDataSource.getRepository(Member);
-        const newMember = memberRepository.create({
-            nomeCompleto,
+        // Garante que nomeCompleto nunca será nulo
+        const memberData = {
+            nomeCompleto: nomeCompleto || name,
             email,
             password: password || '',
             role: role || 'member',
@@ -20,7 +21,8 @@ export const createMember = async (req: Request, res: Response) => {
             gender,
             phone,
             photo
-        });
+        };
+        const newMember = memberRepository.create(memberData);
         await memberRepository.save(newMember);
         res.status(201).json(newMember);
     } catch (error) {
@@ -32,7 +34,6 @@ export const getMembers = async (req: Request, res: Response) => {
     try {
         const memberRepository = AppDataSource.getRepository(Member);
         const members = await memberRepository.find();
-        // Remover o campo password do retorno
         const membersWithoutPassword = members.map(member => {
             const { password, ...rest } = member;
             return rest;
@@ -47,7 +48,7 @@ export const getMemberById = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const memberRepository = AppDataSource.getRepository(Member);
-        const member = await memberRepository.findOne({ where: { id: parseInt(id) } });
+        const member = await memberRepository.findOneBy({ id: Number(id).toString() as any });
         if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
         res.json(member);
     } catch (error) {
@@ -61,7 +62,7 @@ export const updateMember = async (req: Request, res: Response) => {
     const photo = req.file?.path;
     try {
         const memberRepository = AppDataSource.getRepository(Member);
-        const member = await memberRepository.findOne({ where: { id: parseInt(id) } });
+        const member = await memberRepository.findOneBy({ id: Number(id).toString() as any });
         if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
         Object.assign(member, { nomeCompleto, email, password, role, phone, gender, skills, photo });
         await memberRepository.save(member);
@@ -75,14 +76,14 @@ export const deleteMember = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const memberRepository = AppDataSource.getRepository(Member);
-        const member = await memberRepository.findOne({ where: { id: parseInt(id) } });
+        const member = await memberRepository.findOneBy({ id: Number(id).toString() as any });
         if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
         if (!req.query.confirm || req.query.confirm !== 'true') {
             return res.status(400).json({
                 message: 'Confirmação necessária para excluir o membro. Adicione ?confirm=true à URL.',
             });
         }
-        await memberRepository.delete(id);
+        await memberRepository.delete(Number(id).toString() as any);
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Erro ao excluir membro', error });

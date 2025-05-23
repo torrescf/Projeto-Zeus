@@ -26,13 +26,13 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sua_chave_secreta_forte_aqui') as { id: number };
         const memberRepository = AppDataSource.getRepository(Member);
         
-        const member = await memberRepository.findOne({ where: { id: decoded.id } });
+        const member = await memberRepository.findOne({ where: { id: decoded.id.toString() } });
         if (!member) {
             return res.status(401).json({ message: "Invalid token" });
         }
 
         // Adiciona o usuário à requisição para uso posterior
-        req.userId = member.id;
+        req.userId = member.id as any; // id é string (uuid)
         req.user = member;
         next();
     } catch (error) {
@@ -47,3 +47,11 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     }
     next();
 };
+
+// Middleware para permitir membros OU admins
+export function isAdminOrMember(req: Request, res: Response, next: NextFunction) {
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'member')) {
+        return next();
+    }
+    return res.status(403).json({ message: 'Acesso restrito a membros ou administradores.' });
+}

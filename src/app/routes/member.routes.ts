@@ -36,11 +36,25 @@ router.delete('/members-delete/:id', async (req, res) => {
     }
 });
 
+// Rota pública para buscar membro por ID
+router.get('/public/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const memberRepository = AppDataSource.getRepository(Member);
+        const member = await memberRepository.findOneBy({ id });
+        if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
+        const { password, ...rest } = member;
+        res.json(rest);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao buscar membro', error });
+    }
+});
+
 // CRUD de membros
 router.post(
     '/',
     isAdmin,
-    uploadPhoto, // Usar diretamente o middleware configurado
+    uploadPhoto,
     [
         check('nomeCompleto').notEmpty().withMessage('O nome completo é obrigatório.'),
         check('email').isEmail().withMessage('Email inválido.').matches(/@compjunior\.com\.br$/).withMessage('O email deve pertencer ao domínio compjunior.com.br.'),

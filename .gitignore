@@ -55,3 +55,6 @@ app.js.map
 coverage/
 logs/
 Zeus_Postman_Collection_FINAL.json
+
+# NPM package lock file
+package-lock.json

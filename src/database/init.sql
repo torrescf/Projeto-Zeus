@@ -27,10 +27,8 @@ CREATE TABLE IF NOT EXISTS members (
     role VARCHAR(50) NOT NULL,
     isActive BOOLEAN DEFAULT FALSE,
     skills TEXT[],
-    gender VARCHAR(20),
     phone VARCHAR(50),
     photo VARCHAR(255),
-    resetToken VARCHAR(255),
     resetPasswordToken VARCHAR(255),
     resetPasswordExpires TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -43,6 +41,8 @@ CREATE TABLE IF NOT EXISTS clients (
     email VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
+    resetPasswordToken VARCHAR(255),
+    resetPasswordExpires TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -52,24 +52,13 @@ CREATE TABLE IF NOT EXISTS projects (
     name VARCHAR(100) NOT NULL,
     description TEXT,
     client_id INT NOT NULL,
+    amount NUMERIC(15, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) DEFAULT 'Em analise',
     FOREIGN KEY (client_id) REFERENCES clients (id) ON DELETE CASCADE
 );
 
--- Tabela de orçamentos (budgets)
-CREATE TABLE IF NOT EXISTS budgets (
-    id SERIAL PRIMARY KEY,
-    numeroOrcamento VARCHAR(100) NOT NULL,
-    descricaoProjeto TEXT NOT NULL,
-    valorEstimado NUMERIC(15, 2) NOT NULL,
-    custosPrevistos NUMERIC(15, 2) NOT NULL,
-    dataCriacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(50) NOT NULL,
-    clienteId INT NOT NULL,
-    membroResponsavelId INT,
-    FOREIGN KEY (clienteId) REFERENCES clients (id) ON DELETE CASCADE,
-    FOREIGN KEY (membroResponsavelId) REFERENCES members (id) ON DELETE SET NULL
-);
 
 -- Índices para melhorar a performance
 CREATE INDEX IF NOT EXISTS idx_members_email ON members (email);

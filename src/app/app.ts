@@ -7,7 +7,6 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import authRoutes from './routes/auth.routes';
 import memberRoutes from './routes/member.routes';
-import budgetRoutes from './routes/budget.routes';
 import clientRoutes from './routes/client.routes';
 import equipmentRoutes from './routes/equipment.routes';
 import penaltyRoutes from './routes/penalty.routes';
@@ -41,8 +40,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(clientRoutes);
 app.use('/auth', authRoutes);
 app.use(memberRoutes);
-// Adicione esta linha para expor as rotas de budget na raiz (incluindo /budgets):
-app.use(budgetRoutes);
 app.use('/equipment', equipmentRoutes);
 app.use('/penalty', penaltyRoutes);
 app.use('/project', projectRoutes);

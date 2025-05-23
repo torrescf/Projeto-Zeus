@@ -53,11 +53,8 @@ services:
       DB_SYNC: "false" # Desativar sincronização automática em produção
     ports:
       - "3000:3000"  # Mapeamento direto da porta
-    volumes:
-      - .:/app
-      - /app/node_modules
     working_dir: /app
-    command: sh -c "utils/scripts/wait-for-it.sh db:5432 -- npm run dev"
+    command: ["npm", "run", "dev"]
     networks:
       - default
 
@@ -72,8 +69,6 @@ services:
       - DB_HOST=db
     depends_on:
       - db
-    volumes:
-      - .:/usr/src/app
     command: npm start
 
 networks:

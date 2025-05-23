@@ -1,18 +1,18 @@
 import { Router } from "express";
 import { ClientController } from "../../controllers/ClientController";
-import { authMiddleware, isAdmin } from "../../middlewares/authMiddleware";
 import { AppDataSource } from "../../database/data-source";
 import { Client } from "../../database/entities/Client";
+import { uploadPhoto } from "../../middlewares/uploadMiddleware";
 
 const router = Router();
 const controller = new ClientController();
 
 router.post("/register", controller.create); // Rota pública para registro de clientes
-router.post("/", authMiddleware, isAdmin, controller.create);
-router.get("/", authMiddleware, controller.getAll);
-router.get("/:id", authMiddleware, controller.getById);
-router.put("/:id", authMiddleware, isAdmin, controller.update);
-router.delete("/:id", authMiddleware, isAdmin, controller.delete);
+router.post("/", controller.create);
+router.get("/", controller.getAll);
+router.get("/:id", controller.getById);
+router.put("/:id", controller.update);
+router.delete("/:id", controller.delete);
 
 // Rota pública para deletar cliente por ID
 router.delete('/delete/clients/:id', async (req, res) => {
@@ -32,5 +32,8 @@ router.delete('/delete/clients/:id', async (req, res) => {
         res.status(500).json({ message: 'Erro ao deletar cliente', error: error instanceof Error ? error.message : error });
     }
 });
+
+// Upload de foto de perfil do client para o Cloudinary
+router.post('/upload-photo/:id', uploadPhoto, (req, res) => controller.uploadProfilePhoto(req, res));
 
 export default router;

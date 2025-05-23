@@ -5,9 +5,107 @@
         "title": "API Documentation",
         "description": "API documentation for Projeto-Zeus"
     },
-    "host": "localhost:3000",
+    "host": "localhost:4001",
     "basePath": "/",
     "schemes": ["http"],
-    "paths": {},
-    "definitions": {}
+    "paths": {
+        "/member/public/{id}": {
+            "get": {
+                "summary": "Buscar membro público por ID",
+                "description": "Retorna os dados públicos de um membro pelo ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "type": "integer",
+                        "description": "ID do membro"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Membro encontrado",
+                        "schema": { "$ref": "#/definitions/Member" }
+                    },
+                    "404": { "description": "Membro não encontrado" }
+                }
+            }
+        },
+        "/client/register": {
+            "post": {
+                "summary": "Registrar novo cliente",
+                "description": "Cria um novo cliente.",
+                "parameters": [
+                    { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/ClientRegister" } }
+                ],
+                "responses": {
+                    "201": { "description": "Cliente criado" },
+                    "400": { "description": "Dados inválidos ou email já em uso" }
+                }
+            }
+        },
+        "/client/upload-photo/{id}": {
+            "post": {
+                "summary": "Upload de foto de perfil do cliente",
+                "description": "Envia uma foto de perfil para o Cloudinary e salva a URL no cliente.",
+                "consumes": ["multipart/form-data"],
+                "parameters": [
+                    { "name": "id", "in": "path", "required": true, "type": "integer", "description": "ID do cliente" },
+                    { "name": "photo", "in": "formData", "required": true, "type": "file", "description": "Arquivo de imagem" }
+                ],
+                "responses": {
+                    "200": { "description": "Upload realizado com sucesso" },
+                    "400": { "description": "Nenhuma imagem enviada" },
+                    "500": { "description": "Erro ao enviar imagem para o Cloudinary" }
+                }
+            }
+        },
+        "/project": {
+            "post": {
+                "summary": "Criar projeto",
+                "description": "Cria um novo projeto para um cliente.",
+                "parameters": [
+                    { "name": "body", "in": "body", "required": true, "schema": { "$ref": "#/definitions/ProjectCreate" } }
+                ],
+                "responses": {
+                    "201": { "description": "Projeto criado" },
+                    "400": { "description": "Dados inválidos" },
+                    "404": { "description": "Cliente não encontrado" }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Member": {
+            "type": "object",
+            "properties": {
+                "id": { "type": "integer" },
+                "nomeCompleto": { "type": "string" },
+                "email": { "type": "string" },
+                "role": { "type": "string" },
+                "phone": { "type": "string" },
+                "gender": { "type": "string" },
+                "skills": { "type": "array", "items": { "type": "string" } }
+            }
+        },
+        "ClientRegister": {
+            "type": "object",
+            "required": ["name", "email", "password"],
+            "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string" },
+                "password": { "type": "string" },
+                "phone": { "type": "string" }
+            }
+        },
+        "ProjectCreate": {
+            "type": "object",
+            "required": ["name", "description", "clientId"],
+            "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "clientId": { "type": "integer" }
+            }
+        }
+    }
 }

@@ -2,7 +2,6 @@
 // Utiliza o Nodemailer para gerenciar o envio de mensagens.
 
 import nodemailer from 'nodemailer';
-import { Budget } from "../../database/entities/Budget";
 import { Project } from "../../database/entities/Project";
 import { AppDataSource } from "../../database/data-source"; // Adicione esta linha
 
@@ -13,30 +12,38 @@ const transporter = nodemailer.createTransport({
 
 export async function sendPasswordResetEmail(email: string, token: string) {
     const appUrl = process.env.APP_URL || 'http://localhost:4001';
-    const expirationHours = 24; // Token expires in 24 hours
+    const expirationHours = 24;
     const supportEmail = "joao.machado@compjunior.com.br";
-    const logoUrl = "https://imgur.com/a/plscfhN"; // Use o link direto da logo ou ajuste conforme necessário
+    const logoUrl = "https://res.cloudinary.com/dqalvfs9e/image/upload/fl_preserve_transparency/v1747847190/Logotipo_Comp_Junior_ybqpes.jpg?_s=public-apps";
+    const resetLink = `${appUrl}/auth/reset-password/${token}`;
     const html = `
-        <div style="text-align:center; margin-bottom:24px;">
-            <img src="${logoUrl}" alt="Comp Júnior" style="max-width:220px; height:auto; margin-bottom:16px;" />
-        </div>
-        <p>Olá,</p>
-        <p>Recebemos uma solicitação para redefinir a senha da conta associada a este e-mail (${email}).</p>
-        <p><strong>Ação necessária:</strong></p>
-        <p><a href="${appUrl}/reset-password?token=${token}" style="background-color: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir senha</a></p>
-        <p>Este link de redefinição de senha expirará em ${expirationHours} horas.</p>
-        <p><strong>Se você não solicitou esta alteração:</strong></p>
-        <p>Por favor, ignore este e-mail - sua senha permanecerá a mesma. Se estiver preocupado com a segurança de sua conta, entre em contato com nossa equipe de suporte em ${supportEmail}.</p>
-        <p>Atenciosamente,<br/>Equipe de Suporte</p>
-        <p style="font-size: 12px; color: #666;">Por questões de segurança, não responda a este e-mail. Se precisar de ajuda, entre em contato conosco em ${supportEmail}.</p>
-    `;
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 32px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+  <div style="text-align:center; margin-bottom:24px;">
+    <img src="${logoUrl}" alt="Comp Júnior" style="max-width:200px; height:auto;" />
+  </div>
+  <p style="font-size: 16px;">Olá,</p>
+  <p style="font-size: 16px;">Recebemos uma solicitação para redefinir a senha da conta associada a este e-mail: <strong>${email}</strong>.</p>
+  <p style="font-size: 16px;"><strong>Ação necessária:</strong></p>
+  <div style="text-align: center; margin: 24px 0;">
+    <a href="${resetLink}" style="background-color: #0066cc; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">Redefinir Senha</a>
+  </div>
+  <p style="font-size: 16px;">Este link de redefinição de senha expirará em <strong>${expirationHours} horas</strong>.</p>
+  <p style="font-size: 16px;"><strong>Se você não solicitou esta alteração:</strong></p>
+  <p style="font-size: 16px;">Por favor, ignore este e-mail. Sua senha permanecerá a mesma. Se estiver preocupado com a segurança de sua conta, entre em contato com nossa equipe de suporte pelo e-mail <a href="mailto:${supportEmail}" style="color: #0066cc;">${supportEmail}</a>.</p>
+  <p style="font-size: 16px;">Atenciosamente,<br/><strong>Equipe de Suporte - Comp Júnior</strong></p>
+  <hr style="margin: 32px 0; border: none; border-top: 1px solid #ddd;" />
+  <p style="font-size: 12px; color: #888; text-align: center;">Por questões de segurança, não responda a este e-mail. Caso precise de ajuda, entre em contato conosco em <a href="mailto:${supportEmail}" style="color: #888;">${supportEmail}</a>.</p>
+</div>
+   `;
     await transporter.sendMail({
-        from: `"Suporte da Empresa" <${process.env.EMAIL_USER}>`,
+        from: `Suporte da Empresa <${process.env.EMAIL_USER}>`,
         to: email,
         subject: "Redefinição de senha para sua conta",
         html
     });
 }
+
+type Budget = any; // Ajuste: Budget não existe mais como entidade, use Project diretamente ou um tipo genérico
 
 export async function sendBudgetStatusEmail(budget: Budget, previousStatus: string) {
     // Ajuste: buscar dados do projeto relacionado ao orçamento

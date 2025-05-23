@@ -23,7 +23,7 @@ const loginLimiter = rateLimit({
 // Adicionando limitador para envio de e-mails
 const emailLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minuto
-    max: 3, // Máximo de 3 e-mails por minuto
+    max: 2, // Máximo de 3 e-mails por minuto
     message: { message: 'Muitas solicitações de envio de e-mail. Tente novamente mais tarde.' },
     standardHeaders: true,
     legacyHeaders: false,
@@ -38,32 +38,30 @@ export class AuthController {
 
         console.log('[AUTH] Register endpoint hit - Dados recebidos:', req.body);
         try {
-            const { nomeCompleto, email, password, role, phone, gender, skills } = req.body;
-            if (!nomeCompleto || !email || !password) {
-                return res.status(400).json({ message: "nomeCompleto, email e password são obrigatórios" });
-            }
-            const memberRepository = AppDataSource.getRepository(Member);
-            const existingMember = await memberRepository.findOne({ where: { email } });
-            if (existingMember) {
-                console.log('[AUTH] Email já em uso:', email);
-                return res.status(400).json({ message: "Email already in use" });
-            }
-            console.log('[AUTH] Criptografando senha...');
-            const hashedPassword = await bcrypt.hash(password, 10);
-            console.log('[AUTH] Senha criptografada com sucesso');
-            const newMember = memberRepository.create({
-                nomeCompleto,
+            // Corrija: use "nomeCompleto" apenas se existir na entidade
+            const { nomeCompleto, email, password, role, phone, gender, skills, name } = req.body;
+            let memberData: any = {
                 email,
-                password: hashedPassword,
+                password: await bcrypt.hash(password, 10),
                 role: role || "member",
                 isActive: true,
                 phone,
                 gender,
                 skills: Array.isArray(skills) ? skills : (typeof skills === "string" ? skills.split(",") : []),
-            });
+                nomeCompleto: nomeCompleto || name
+            };
+            if (!memberData.nomeCompleto || !email || !password) {
+                return res.status(400).json({ message: "nomeCompleto, email e password são obrigatórios" });
+            }
+            const memberRepository = AppDataSource.getRepository(Member);
+            const existingMember = await memberRepository.findOne({ where: { email } });
+            if (existingMember) {
+                return res.status(400).json({ message: "Email already in use" });
+            }
+            const newMember = memberRepository.create(memberData);
             await memberRepository.save(newMember);
-            console.log('[AUTH] Usuário criado com ID:', newMember.id);
-            const memberWithoutPassword: Omit<Member, 'password'> & { password?: string } = { ...newMember };
+            // Remover password do retorno (Member é objeto, não array)
+            const memberWithoutPassword = { ...newMember } as any;
             delete memberWithoutPassword.password;
             return res.status(201).json(memberWithoutPassword);
         } catch (error) {
@@ -84,27 +82,41 @@ export class AuthController {
                 return res.status(400).json({ message: 'Email e senha são obrigatórios' });
             }
 
+            // Primeiro tenta autenticar como membro
             const memberRepository = AppDataSource.getRepository(Member);
             const member = await memberRepository.findOne({ where: { email }, select: ['id', 'password', 'role'] });
-
-            if (!member || !(await bcrypt.compare(password, member.password))) {
-                return res.status(401).json({ message: 'Credenciais inválidas' });
+            if (member && await bcrypt.compare(password, member.password)) {
+                const token = jwt.sign(
+                    { id: member.id, role: member.role },
+                    process.env.JWT_SECRET || 'sua_chave_secreta_forte_aqui',
+                    { expiresIn: '1h' }
+                );
+                const refreshToken = jwt.sign(
+                    { id: member.id },
+                    process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
+                    { expiresIn: '7d' }
+                );
+                return res.json({ token, refreshToken, type: 'member' });
             }
 
-            const token = jwt.sign(
-                { id: member.id, role: member.role },
-                process.env.JWT_SECRET || 'sua_chave_secreta_forte_aqui',
-                { expiresIn: '1h' } // Expiração de 1 hora
-            );
+            // Se não for membro, tenta autenticar como cliente
+            const clientRepository = AppDataSource.getRepository(require('../database/entities/Client').Client);
+            const client = await clientRepository.findOne({ where: { email } });
+            if (client && await bcrypt.compare(password, client.password)) {
+                const token = jwt.sign(
+                    { id: client.id, type: 'client' },
+                    process.env.JWT_SECRET || 'sua_chave_secreta_forte_aqui',
+                    { expiresIn: '1h' }
+                );
+                const refreshToken = jwt.sign(
+                    { id: client.id, type: 'client' },
+                    process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
+                    { expiresIn: '7d' }
+                );
+                return res.json({ token, refreshToken, type: 'client' });
+            }
 
-            // Adicionar refreshToken opcional
-            const refreshToken = jwt.sign(
-                { id: member.id },
-                process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
-                { expiresIn: '7d' } // Expiração de 7 dias
-            );
-
-            res.json({ token, refreshToken });
+            return res.status(401).json({ message: 'Credenciais inválidas' });
         } catch (error) {
             res.status(500).json({ message: 'Erro interno do servidor', error });
         }
@@ -122,7 +134,7 @@ export class AuthController {
             }
 
             const token = crypto.randomBytes(20).toString('hex');
-            member.resetToken = token;
+            member.resetPasswordToken = token;
             member.resetPasswordExpires = addHours(new Date(), 1); // Expira em 1 hora
             await memberRepository.save(member);
 
@@ -139,14 +151,14 @@ export class AuthController {
 
         try {
             const memberRepository = AppDataSource.getRepository(Member);
-            const member = await memberRepository.findOne({ where: { resetToken: token } });
+            const member = await memberRepository.findOne({ where: { resetPasswordToken: token } });
 
             if (!member) {
                 return res.status(400).json({ message: 'Token inválido ou expirado' });
             }
 
             member.password = await bcrypt.hash(password, 10);
-            member.resetToken = undefined;
+            member.resetPasswordToken = ""; // Corrija: use string vazia para resetPasswordToken
             await memberRepository.save(member);
 
             res.json({ message: 'Senha redefinida com sucesso' });
