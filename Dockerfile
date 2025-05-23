@@ -9,8 +9,6 @@ RUN npm install
 # Copiar código e scripts
 COPY . .
 
-RUN ls -lR /app/utils/scripts
-RUN chmod +x ./utils/scripts/wait-for-it.sh
 
 # Build para produção
 FROM base AS production
