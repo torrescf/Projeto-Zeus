@@ -89,3 +89,11 @@ export const deleteMember = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Erro ao excluir membro', error });
     }
 };
+
+export const getPublicAll = async (req: Request, res: Response) => {
+    const memberRepository = AppDataSource.getRepository(Member);
+    const members = await memberRepository.find();
+    // Remove a senha de todos os membros
+    const membersWithoutPassword = members.map(({ password, ...rest }) => rest);
+    res.json(membersWithoutPassword);
+};

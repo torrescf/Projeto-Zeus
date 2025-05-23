@@ -32,18 +32,16 @@ app.use(rateLimit({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Rotas
-// Remova ou comente esta linha se quiser as rotas públicas de client na raiz:
-// app.use('/client', clientRoutes);
+// Swagger deve vir antes das rotas dinâmicas
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Adicione esta linha para expor as rotas de client na raiz (incluindo /delete/clients/:id):
-app.use(clientRoutes);
+// Rotas agrupadas por prefixo para melhor organização no Swagger
+app.use('/client', clientRoutes);
 app.use('/auth', authRoutes);
-app.use(memberRoutes);
+app.use('/member', memberRoutes);
 app.use('/equipment', equipmentRoutes);
 app.use('/penalty', penaltyRoutes);
 app.use('/project', projectRoutes);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.post('/budgets-create', createBudgetByClientId);
 
 // Rota de verificação de saúde

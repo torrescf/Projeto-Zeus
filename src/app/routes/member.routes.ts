@@ -8,15 +8,6 @@ import { Member } from "../../database/entities/Member";
 
 const router = express.Router();
 
-// Rota pública para listar todos os membros (deve vir antes das rotas com parâmetros)
-router.get('/list/members', async (req, res) => {
-    try {
-        await getMembers(req, res);
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao listar membros', error });
-    }
-});
-
 // Rota pública para deletar membro por ID
 router.delete('/members-delete/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10);
@@ -49,6 +40,10 @@ router.get('/public/:id', async (req, res) => {
         res.status(500).json({ message: 'Erro ao buscar membro', error });
     }
 });
+
+// Rota pública para listar todos os membros sem senha
+import { getPublicAll } from '../../controllers/MemberController';
+router.get('/public', getPublicAll);
 
 // CRUD de membros
 router.post(

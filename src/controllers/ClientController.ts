@@ -40,16 +40,30 @@ export class ClientController {
     async getAll(req: Request, res: Response) {
         const clientRepository = AppDataSource.getRepository(Client);
         const clients = await clientRepository.find({ relations: ["projects"] });
-        res.json(clients);
+        // Remove a senha e garante que photoUrl aparece mesmo se null
+        const clientsWithoutPassword = clients.map(client => {
+            const { password, ...rest } = client;
+            return { ...rest, photoUrl: client.photoUrl ?? null };
+        });
+        res.json(clientsWithoutPassword);
     }
 
     async getById(req: Request, res: Response) {
+        const id = Number(req.params.id);
+        if (isNaN(id)) {
+            return res.status(400).json({ message: "ID inválido" });
+        }
         const clientRepository = AppDataSource.getRepository(Client);
         const client = await clientRepository.findOne({
-            where: { id: parseInt(req.params.id) },
+            where: { id },
             relations: ["projects"],
         });
-        client ? res.json(client) : res.status(404).json({ message: "Client not found" });
+        if (client) {
+            const { password, ...clientWithoutPassword } = client;
+            res.json(clientWithoutPassword);
+        } else {
+            res.status(404).json({ message: "Client not found" });
+        }
     }
 
     async update(req: Request, res: Response) {
