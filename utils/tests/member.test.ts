@@ -1,13 +1,28 @@
 import request from "supertest";
 import { app } from "../../src/index";
 import { AppDataSource } from "../../src/database/data-source";
+import path from "path";
 
+let token: string;
 let memberId: number;
 
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
   }
+  // Cria e autentica um membro
+  await request(app).post("/member").send({
+    nomeCompleto: "Membro",
+    email: "membro@compjunior.com.br",
+    password: "123456",
+    role: "member",
+    phone: "123456789"
+  });
+  const loginRes = await request(app).post("/auth/login").send({
+    email: "membro@compjunior.com.br",
+    password: "123456"
+  });
+  token = loginRes.body.token;
 });
 
 afterAll(async () => {
@@ -17,62 +32,51 @@ afterAll(async () => {
 });
 
 describe("Member Endpoints", () => {
-    beforeEach(async () => {
-        await AppDataSource.getRepository("member").createQueryBuilder().delete().execute();
-        // Cria um membro para os testes que precisam de um ID existente
-        const response = await request(app)
-            .post("/members")
-            .send({
-                nomeCompleto: "Test Member",
-                dataNascimento: "2000-01-01",
-                emailInstitucional: "test@compjunior.com.br",
-                cargo: "Developer",
-                telefone: "123456789",
-                genero: "Masculino",
-                dataIngresso: "2023-01-01",
-                habilidades: ["Node.js", "TypeScript"]
-            });
-        memberId = response.body.id;
-    });
+  it("should create a member", async () => {
+    const res = await request(app)
+      .post("/member")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        nomeCompleto: "Novo Membro",
+        email: "novo@compjunior.com.br",
+        password: "123456",
+        role: "member",
+        phone: "123456789"
+      });
+    expect(res.status).toBe(201);
+    expect(res.body.id).toBeDefined();
+    memberId = res.body.id;
+  });
 
-    it("should create a member with valid data", async () => {
-        // O beforeEach já criou um membro, então só verifica o status
-        expect(memberId).toBeDefined();
-    });
+  it("should get all members", async () => {
+    const res = await request(app)
+      .get("/member/public");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
 
-    it("should not create a member with invalid email domain", async () => {
-        const response = await request(app)
-            .post("/members")
-            .send({
-                nomeCompleto: "Invalid Email Member",
-                dataNascimento: "2000-01-01",
-                emailInstitucional: "test@gmail.com",
-                cargo: "Developer",
-                telefone: "123456789",
-                genero: "Masculino",
-                dataIngresso: "2023-01-01",
-                habilidades: ["Node.js", "TypeScript"]
-            });
-        expect(response.status).toBe(400);
-        expect(response.body.message).toBe("O email deve pertencer ao domínio compjunior.ufl.edu.br");
-    });
+  it("should update a member", async () => {
+    const res = await request(app)
+      .put(`/member/${memberId}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ nomeCompleto: "Membro Atualizado" });
+    expect(res.status).toBe(200);
+    expect(res.body.nomeCompleto).toBe("Membro Atualizado");
+  });
 
-    it("should get all members", async () => {
-        const response = await request(app).get("/members");
-        expect(response.status).toBe(200);
-        expect(response.body).toBeInstanceOf(Array);
-    });
+  it("should upload member photo", async () => {
+    const res = await request(app)
+      .post(`/member/upload-photo/${memberId}`)
+      .set("Authorization", `Bearer ${token}`)
+      .attach("photo", path.resolve(__dirname, "../public/demo.gif"));
+    expect(res.status).toBe(200);
+    expect(res.body.url).toMatch(/^https:\/\/res\.cloudinary\.com\//);
+  });
 
-    it("should update a member", async () => {
-        const response = await request(app)
-            .put(`/members/${memberId}`)
-            .send({ nomeCompleto: "Updated Member" });
-        expect(response.status).toBe(200);
-        expect(response.body.nomeCompleto).toBe("Updated Member");
-    });
-
-    it("should delete a member with confirmation", async () => {
-        const response = await request(app).delete(`/members/${memberId}?confirm=true`);
-        expect(response.status).toBe(204);
-    });
+  it("should delete a member", async () => {
+    const res = await request(app)
+      .delete(`/member/${memberId}`)
+      .set("Authorization", `Bearer ${token}`);
+    expect([200, 204]).toContain(res.status);
+  });
 });
