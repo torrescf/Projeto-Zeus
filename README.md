@@ -40,7 +40,7 @@ Sistema interno para gestão de membros, clientes, projetos e orçamentos da Com
    DB_HOST=db
    DB_PORT=5432
    DB_USER=postgres
-   DB_PASSWORD=147afj
+   DB_PASSWORD=senha_do_seu_database
    DB_NAME=zeus_admin
    CLOUDINARY_CLOUD_NAME=seu_cloud_name
    CLOUDINARY_API_KEY=sua_api_key
