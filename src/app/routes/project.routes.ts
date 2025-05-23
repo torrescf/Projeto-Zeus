@@ -7,11 +7,11 @@ const controller = new ProjectController();
 
 // Permite que qualquer usuário crie projetos (sem autenticação)
 router.post("/", (req, res) => controller.create(req, res));
-router.get("/", authMiddleware, controller.getAll);
-router.get("/:id", authMiddleware, controller.getById);
+router.get("/", authMiddleware, (req, res) => controller.getAll(req, res));
+router.get("/:id", authMiddleware, (req, res) => controller.getById(req, res));
 // Permite que membros e admins atualizem projetos
 router.put("/:id/status", authMiddleware, isAdminOrMember, controller.updateStatus);
-router.put("/:id", authMiddleware, isAdmin, controller.update);
+router.put("/:id", authMiddleware, isAdminOrMember, (req, res) => controller.update(req, res));
 router.delete("/:id", authMiddleware, isAdmin, controller.delete);
 
 export default router;

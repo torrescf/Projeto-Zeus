@@ -1,10 +1,18 @@
 import express from 'express';
 import { createMember, getMembers, getMemberById, updateMember, deleteMember } from '../../controllers/MemberController';
 import { isAdmin } from '../../middlewares/authMiddleware';
+import { authMiddleware } from '../../middlewares/authMiddleware';
 import { uploadPhoto } from '../../middlewares/uploadMiddleware';
 import { check } from 'express-validator';
 import { AppDataSource } from "../../database/data-source";
 import { Member } from "../../database/entities/Member";
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: 'dqalvfs9e',
+  api_key: '481816896419698',
+  api_secret: 'RZY2bnvKSU2puaSLMo32GqO0nRU',
+});
 
 const router = express.Router();
 
@@ -62,7 +70,30 @@ router.post(
 );
 router.get('/', isAdmin, getMembers);
 router.get('/:id', isAdmin, getMemberById);
-router.put('/:id', isAdmin, uploadPhoto, updateMember);
+router.put('/:id', authMiddleware, uploadPhoto, (req, res) => updateMember(req, res));
 router.delete('/:id', isAdmin, deleteMember);
+
+// Rota para upload de foto do membro
+router.post('/upload-photo/:id', authMiddleware, uploadPhoto, async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'Nenhuma imagem enviada.' });
+    }
+    try {
+        // Upload para Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'members',
+            public_id: `member_${req.params.id}`,
+            overwrite: true
+        });
+        const memberRepository = AppDataSource.getRepository(Member);
+        const member = await memberRepository.findOneBy({ id: req.params.id });
+        if (!member) return res.status(404).json({ message: 'Membro não encontrado' });
+        member.photo = result.secure_url;
+        await memberRepository.save(member);
+        res.json({ url: result.secure_url });
+    } catch (error) {
+        res.status(500).json({ message: 'Erro ao enviar imagem para o Cloudinary', error });
+    }
+});
 
 export default router;

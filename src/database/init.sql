@@ -59,6 +59,16 @@ CREATE TABLE IF NOT EXISTS projects (
     FOREIGN KEY (client_id) REFERENCES clients (id) ON DELETE CASCADE
 );
 
+-- Tabela de equipamentos
+CREATE TABLE IF NOT EXISTS equipment (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "checkedOutById" INT,
+    FOREIGN KEY ("checkedOutById") REFERENCES members(id) ON DELETE SET NULL
+);
 
 -- Índices para melhorar a performance
 CREATE INDEX IF NOT EXISTS idx_members_email ON members (email);

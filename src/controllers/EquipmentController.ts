@@ -53,6 +53,15 @@ export class EquipmentController {
         res.status(200).json(equipment);
     }
 
+    async update(req: Request, res: Response) {
+        const id = parseInt(req.params.id);
+        const equipment = await this.equipmentRepository.findOne({ where: { id } });
+        if (!equipment) return res.status(404).json({ message: "Equipment not found" });
+        Object.assign(equipment, req.body);
+        await this.equipmentRepository.save(equipment);
+        res.status(200).json(equipment);
+    }
+
     async delete(req: Request, res: Response) {
         const result = await this.equipmentRepository.delete(req.params.id);
         result.affected ? res.status(204).send() : res.status(404).json({ message: "Equipment not found" });
