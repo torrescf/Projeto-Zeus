@@ -1,285 +1,954 @@
 {
-    "swagger": "2.0",
+    "openapi": "3.0.0",
     "info": {
-        "version": "1.0.0",
-        "title": "Documentação da API",
-        "description": "Documentação do Projeto-Zeus, uma API para gerenciamento de membros, clientes, projetos e equipamentos.",
-        "termsOfService": "http://swagger.io/terms/"
+        "title": "Zeus API",
+        "description": "API for managing clients, members, projects, equipment, and penalties in the Zeus system",
+        "version": "1.0.0"
     },
-    "host": "localhost:4001",
-    "basePath": "/",
-    "schemes": ["http"],
+    "servers": [
+        {
+            "url": "http://localhost:4001",
+            "description": "Local development server"
+        }
+    ],
+    "tags": [
+        { "name": "Auth", "description": "Authentication and user management" },
+        { "name": "Client", "description": "Client operations" },
+        { "name": "Member", "description": "Member operations" },
+        { "name": "Project", "description": "Project management" },
+        { "name": "Equipment", "description": "Equipment management" },
+        { "name": "Penalty", "description": "Penalty system" },
+        { "name": "System", "description": "System health and documentation" }
+    ],
     "paths": {
         "/auth/login": {
             "post": {
-                "summary": "Login de usuário",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "email": { "type": "string" }, "password": { "type": "string" } }, "required": ["email", "password"] } }
-                ],
-                "responses": { "200": { "description": "Login realizado com sucesso" }, "401": { "description": "Credenciais inválidas" } }
+                "tags": ["Auth"],
+                "summary": "User login",
+                "description": "Authenticate a user and return a JWT token",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": { "type": "string", "format": "email", "example": "admin@compjunior.com.br" },
+                                    "password": { "type": "string", "example": "123456" }
+                                },
+                                "required": ["email", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": { "type": "string", "description": "JWT token for authentication" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": { "description": "Unauthorized - Invalid credentials" }
+                }
+            }
+        },
+        "/auth/register-client": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Register a new client",
+                "description": "Create a new client account",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": { "type": "string", "example": "Eu" },
+                                    "email": { "type": "string", "format": "email", "example": "dejesusmchadojp@gmail.com" },
+                                    "password": { "type": "string", "example": "senhaSgura123" },
+                                    "role": { "type": "string", "example": "client" },
+                                    "phone": { "type": "string", "example": "(22) 99999-8888" },
+                                    "gender": { "type": "string", "example": "F" },
+                                    "skills": { "type": "string", "example": "Node, React, angular" },
+                                    "data_nascimento": { "type": "string", "format": "date", "example": "1995-05-23" }
+                                },
+                                "required": ["name", "email", "password", "role"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Client created successfully" },
+                    "400": { "description": "Bad request - Invalid input data" }
+                }
             }
         },
         "/auth/register": {
             "post": {
-                "summary": "Registrar novo usuário (membro ou cliente)",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "nomeCompleto": { "type": "string" }, "email": { "type": "string" }, "password": { "type": "string" }, "role": { "type": "string" }, "phone": { "type": "string" } } } }
-                ],
-                "responses": { "201": { "description": "Usuário criado" }, "400": { "description": "Dados inválidos ou email já em uso" } }
+                "tags": ["Auth"],
+                "summary": "Register a new member",
+                "description": "Create a new member account (admin only)",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "nomeCompleto": { "type": "string", "example": "Joao Pedro Oliveira de jesus" },
+                                    "email": { "type": "string", "format": "email", "example": "joao.machado@compjunior.com.br" },
+                                    "password": { "type": "string", "example": "senhaSegura123" },
+                                    "role": { "type": "string", "example": "admin" },
+                                    "phone": { "type": "string", "example": "(22) 997678267" },
+                                    "gender": { "type": "string", "example": "F" },
+                                    "skills": { "type": "string", "example": "Node, React" },
+                                    "data_nascimento": { "type": "string", "example": "16/06/2004" }
+                                },
+                                "required": ["nomeCompleto", "email", "password", "role"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Member created successfully" },
+                    "403": { "description": "Forbidden - Only admins can create members" }
+                }
+            }
+        },
+        "/auth/forgot-password-client": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Request password reset",
+                "description": "Send a password reset email to the user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": { "type": "string", "format": "email", "example": "seu@email.com" }
+                                },
+                                "required": ["email"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Password reset email sent" },
+                    "404": { "description": "User not found" }
+                }
             }
         },
         "/auth/reset-password/{token}": {
             "post": {
-                "summary": "Redefinir senha",
+                "tags": ["Auth"],
+                "summary": "Reset password",
+                "description": "Reset user password with a valid token",
                 "parameters": [
-                    { "name": "token", "in": "path", "required": true, "type": "string" },
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "password": { "type": "string" } }, "required": ["password"] } }
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string" }
+                    }
                 ],
-                "responses": { "200": { "description": "Senha redefinida com sucesso" }, "400": { "description": "Token inválido ou expirado" } }
-            }
-        },
-        "/auth/forgot-password": {
-            "post": {
-                "summary": "Solicitar redefinição de senha",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "email": { "type": "string" } }, "required": ["email"] } }
-                ],
-                "responses": { "200": { "description": "E-mail de redefinição enviado" }, "404": { "description": "Usuário não encontrado" } }
-            }
-        },
-        "/member": {
-            "post": {
-                "summary": "Criar membro",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "nomeCompleto": { "type": "string" }, "email": { "type": "string" }, "password": { "type": "string" }, "role": { "type": "string" }, "phone": { "type": "string" } }, "required": ["nomeCompleto", "email", "password", "role", "phone"] } }
-                ],
-                "responses": { "201": { "description": "Membro criado" }, "400": { "description": "Dados inválidos" } }
-            },
-            "get": {
-                "summary": "Listar todos os membros",
-                "responses": { "200": { "description": "Lista de membros" } }
-            }
-        },
-        "/list/members": {
-            "get": {
-                "summary": "Listar todos os membros (rota alternativa)",
-                "responses": { "200": { "description": "Lista de membros" } }
-            }
-        },
-        "/member/{id}": {
-            "put": {
-                "summary": "Atualizar membro",
-                "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" },
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "nomeCompleto": { "type": "string" }, "email": { "type": "string" }, "role": { "type": "string" } } } }
-                ],
-                "responses": { "200": { "description": "Membro atualizado" }, "404": { "description": "Membro não encontrado" } }
-            },
-            "delete": {
-                "summary": "Deletar membro",
-                "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
-                ],
-                "responses": { "200": { "description": "Membro deletado" }, "404": { "description": "Membro não encontrado" } }
-            }
-        },
-        "/member/upload-photo/{id}": {
-            "post": {
-                "summary": "Upload de foto do membro",
-                "consumes": ["multipart/form-data"],
-                "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" },
-                    { "name": "photo", "in": "formData", "required": true, "type": "file" }
-                ],
-                "responses": { "200": { "description": "Upload realizado com sucesso" }, "400": { "description": "Nenhuma imagem enviada" } }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "password": { "type": "string", "example": "novaSenhaForte123" }
+                                },
+                                "required": ["password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Password reset successfully" },
+                    "400": { "description": "Invalid or expired token" }
+                }
             }
         },
         "/client": {
             "get": {
-                "summary": "Listar todos os clientes",
-                "responses": { "200": { "description": "Lista de clientes" } }
+                "tags": ["Client"],
+                "summary": "Get all clients",
+                "description": "Retrieve a list of all clients",
+                "responses": {
+                    "200": {
+                        "description": "A list of clients",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/Client" }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Client"],
+                "summary": "Create a new client",
+                "description": "Create a new client record",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/ClientInput" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Client created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Client" }
+                            }
+                        }
+                    }
+                }
             }
         },
-        "/client/{id}": {
+        "/client/{client_id}": {
             "get": {
-                "summary": "Buscar cliente por ID",
+                "tags": ["Client"],
+                "summary": "Get client by ID",
+                "description": "Retrieve a single client by their ID",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "client_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Cliente encontrado" }, "404": { "description": "Cliente não encontrado" } }
+                "responses": {
+                    "200": {
+                        "description": "Client details",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Client" }
+                            }
+                        }
+                    },
+                    "404": { "description": "Client not found" }
+                }
             },
             "put": {
-                "summary": "Atualizar cliente",
+                "tags": ["Client"],
+                "summary": "Update client",
+                "description": "Update an existing client",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" },
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "email": { "type": "string" }, "phone": { "type": "string" } } } }
+                    {
+                        "name": "client_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Cliente atualizado" }, "404": { "description": "Cliente não encontrado" } }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/ClientUpdate" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Client updated successfully" },
+                    "404": { "description": "Client not found" }
+                }
             },
             "delete": {
-                "summary": "Deletar cliente",
+                "tags": ["Client"],
+                "summary": "Delete client",
+                "description": "Delete a client record",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "client_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Cliente deletado" }, "404": { "description": "Cliente não encontrado" } }
+                "responses": {
+                    "204": { "description": "Client deleted successfully" },
+                    "404": { "description": "Client not found" }
+                }
             }
         },
-        "/client/upload-photo/{id}": {
+        "/client/upload-photo/{client_id}": {
             "post": {
-                "summary": "Upload de foto de perfil do cliente",
-                "description": "Envia uma foto de perfil para o Cloudinary e salva a URL no cliente. Requer autenticação Bearer.",
-                "consumes": ["multipart/form-data"],
+                "tags": ["Client"],
+                "summary": "Upload client photo",
+                "description": "Upload a profile photo for a client",
                 "parameters": [
-                    { "name": "Authorization", "in": "header", "required": true, "type": "string", "description": "Bearer <token>" },
-                    { "name": "id", "in": "path", "required": true, "type": "integer" },
-                    { "name": "photo", "in": "formData", "required": true, "type": "file" }
+                    {
+                        "name": "client_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Upload realizado com sucesso" }, "400": { "description": "Nenhuma imagem enviada" }, "401": { "description": "Token ausente ou inválido" }, "500": { "description": "Erro ao enviar imagem para o Cloudinary" } }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "photo": { "type": "string", "format": "binary" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Photo uploaded successfully" },
+                    "400": { "description": "Invalid file or client ID" }
+                }
+            }
+        },
+        "/member/{member_id}": {
+            "get": {
+                "tags": ["Member"],
+                "summary": "Get member by ID",
+                "description": "Retrieve a single member by their ID",
+                "parameters": [
+                    {
+                        "name": "member_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member details",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Member" }
+                            }
+                        }
+                    },
+                    "404": { "description": "Member not found" }
+                }
+            },
+            "put": {
+                "tags": ["Member"],
+                "summary": "Update member",
+                "description": "Update an existing member",
+                "parameters": [
+                    {
+                        "name": "member_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/MemberUpdate" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Member updated successfully" },
+                    "404": { "description": "Member not found" }
+                }
+            },
+            "delete": {
+                "tags": ["Member"],
+                "summary": "Delete member",
+                "description": "Delete a member record",
+                "parameters": [
+                    {
+                        "name": "member_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "204": { "description": "Member deleted successfully" },
+                    "404": { "description": "Member not found" }
+                }
+            }
+        },
+        "/member/upload-photo/{member_id}": {
+            "post": {
+                "tags": ["Member"],
+                "summary": "Upload member photo",
+                "description": "Upload a profile photo for a member (requires authentication)",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "member_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "photo": { "type": "string", "format": "binary" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Photo uploaded successfully" },
+                    "401": { "description": "Unauthorized - Invalid or missing token" },
+                    "400": { "description": "Invalid file or member ID" }
+                }
             }
         },
         "/project": {
-            "post": {
-                "summary": "Criar projeto",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" }, "clientId": { "type": "integer" }, "memberId": { "type": "integer" } }, "required": ["name", "description", "clientId", "memberId"] } }
-                ],
-                "responses": { "201": { "description": "Projeto criado" }, "400": { "description": "Dados inválidos" }, "404": { "description": "Cliente não encontrado" } }
-            },
             "get": {
-                "summary": "Listar todos os projetos",
-                "responses": { "200": { "description": "Lista de projetos" } }
+                "tags": ["Project"],
+                "summary": "Get all projects",
+                "description": "Retrieve a list of all projects (requires authentication)",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "A list of projects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/Project" }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Project"],
+                "summary": "Create a new project",
+                "description": "Create a new project record",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/ProjectInput" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Project" }
+                            }
+                        }
+                    }
+                }
             }
         },
-        "/project/{id}": {
+        "/project/{project_id}": {
             "get": {
-                "summary": "Buscar projeto por ID",
+                "tags": ["Project"],
+                "summary": "Get project by ID",
+                "description": "Retrieve a single project by its ID",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Projeto encontrado" }, "404": { "description": "Projeto não encontrado" } }
+                "responses": {
+                    "200": {
+                        "description": "Project details",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Project" }
+                            }
+                        }
+                    },
+                    "404": { "description": "Project not found" }
+                }
             },
             "put": {
-                "summary": "Atualizar projeto",
+                "tags": ["Project"],
+                "summary": "Update project",
+                "description": "Update an existing project",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" },
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" }, "status": { "type": "string" } } } }
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Projeto atualizado" }, "404": { "description": "Projeto não encontrado" } }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/ProjectUpdate" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Project updated successfully" },
+                    "404": { "description": "Project not found" }
+                }
             },
             "delete": {
-                "summary": "Deletar projeto",
+                "tags": ["Project"],
+                "summary": "Delete project",
+                "description": "Delete a project record",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "project_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Projeto deletado" }, "404": { "description": "Projeto não encontrado" } }
+                "responses": {
+                    "204": { "description": "Project deleted successfully" },
+                    "404": { "description": "Project not found" }
+                }
             }
         },
         "/equipment": {
-            "post": {
-                "summary": "Criar equipamento",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" } }, "required": ["name", "description"] } }
-                ],
-                "responses": { "201": { "description": "Equipamento criado" }, "400": { "description": "Dados inválidos" } }
-            },
             "get": {
-                "summary": "Listar todos os equipamentos",
-                "responses": { "200": { "description": "Lista de equipamentos" } }
+                "tags": ["Equipment"],
+                "summary": "Get all equipment",
+                "description": "Retrieve a list of all equipment",
+                "responses": {
+                    "200": {
+                        "description": "A list of equipment",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/Equipment" }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Equipment"],
+                "summary": "Create new equipment",
+                "description": "Create a new equipment record",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/EquipmentInput" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Equipment created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Equipment" }
+                            }
+                        }
+                    }
+                }
             }
         },
-        "/equipment/{id}": {
+        "/equipment/{equipment_id}": {
             "get": {
-                "summary": "Buscar equipamento por ID",
+                "tags": ["Equipment"],
+                "summary": "Get equipment by ID",
+                "description": "Retrieve a single equipment by its ID",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "equipment_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Equipamento encontrado" }, "404": { "description": "Equipamento não encontrado" } }
+                "responses": {
+                    "200": {
+                        "description": "Equipment details",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Equipment" }
+                            }
+                        }
+                    },
+                    "404": { "description": "Equipment not found" }
+                }
             },
             "put": {
-                "summary": "Atualizar equipamento",
+                "tags": ["Equipment"],
+                "summary": "Update equipment",
+                "description": "Update an existing equipment",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" },
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "name": { "type": "string" }, "description": { "type": "string" } } } }
+                    {
+                        "name": "equipment_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Equipamento atualizado" }, "404": { "description": "Equipamento não encontrado" } }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/EquipmentUpdate" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Equipment updated successfully" },
+                    "404": { "description": "Equipment not found" }
+                }
             },
             "delete": {
-                "summary": "Deletar equipamento",
+                "tags": ["Equipment"],
+                "summary": "Delete equipment",
+                "description": "Delete an equipment record",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "equipment_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Equipamento deletado" }, "404": { "description": "Equipamento não encontrado" } }
+                "responses": {
+                    "204": { "description": "Equipment deleted successfully" },
+                    "404": { "description": "Equipment not found" }
+                }
             }
         },
         "/penalty": {
-            "post": {
-                "summary": "Criar penalidade",
-                "parameters": [
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "type": { "type": "string" }, "reason": { "type": "string" }, "date": { "type": "string", "format": "date" }, "memberId": { "type": "integer" } }, "required": ["type", "reason", "date", "memberId"] } }
-                ],
-                "responses": { "201": { "description": "Penalidade criada" }, "400": { "description": "Dados inválidos" } }
-            },
             "get": {
-                "summary": "Listar todas as penalidades",
-                "responses": { "200": { "description": "Lista de penalidades" } }
+                "tags": ["Penalty"],
+                "summary": "Get all penalties",
+                "description": "Retrieve a list of all penalties",
+                "responses": {
+                    "200": {
+                        "description": "A list of penalties",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/components/schemas/Penalty" }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Penalty"],
+                "summary": "Create new penalty",
+                "description": "Create a new penalty record",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/PenaltyInput" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Penalty created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Penalty" }
+                            }
+                        }
+                    }
+                }
             }
         },
-        "/penalty/{id}": {
+        "/penalty/{penalty_id}": {
             "get": {
-                "summary": "Buscar penalidade por ID",
+                "tags": ["Penalty"],
+                "summary": "Get penalty by ID",
+                "description": "Retrieve a single penalty by its ID",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "penalty_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Penalidade encontrada" }, "404": { "description": "Penalidade não encontrada" } }
+                "responses": {
+                    "200": {
+                        "description": "Penalty details",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/Penalty" }
+                            }
+                        }
+                    },
+                    "404": { "description": "Penalty not found" }
+                }
             },
             "put": {
-                "summary": "Atualizar penalidade",
+                "tags": ["Penalty"],
+                "summary": "Update penalty",
+                "description": "Update an existing penalty",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" },
-                    { "name": "body", "in": "body", "required": true, "schema": { "type": "object", "properties": { "type": { "type": "string" }, "reason": { "type": "string" } } } }
+                    {
+                        "name": "penalty_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Penalidade atualizada" }, "404": { "description": "Penalidade não encontrada" } }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/PenaltyUpdate" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Penalty updated successfully" },
+                    "404": { "description": "Penalty not found" }
+                }
             },
             "delete": {
-                "summary": "Deletar penalidade",
+                "tags": ["Penalty"],
+                "summary": "Delete penalty",
+                "description": "Delete a penalty record",
                 "parameters": [
-                    { "name": "id", "in": "path", "required": true, "type": "integer" }
+                    {
+                        "name": "penalty_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
                 ],
-                "responses": { "200": { "description": "Penalidade deletada" }, "404": { "description": "Penalidade não encontrada" } }
+                "responses": {
+                    "204": { "description": "Penalty deleted successfully" },
+                    "404": { "description": "Penalty not found" }
+                }
+            }
+        },
+        "/healthcheck": {
+            "get": {
+                "tags": ["System"],
+                "summary": "Health check",
+                "description": "Check if the API is running",
+                "responses": {
+                    "200": {
+                        "description": "API is healthy",
+                        "content": {
+                            "text/plain": {
+                                "schema": { "type": "string", "example": "OK" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api-docs": {
+            "get": {
+                "tags": ["System"],
+                "summary": "API documentation",
+                "description": "Get the API documentation in Swagger format",
+                "responses": {
+                    "200": {
+                        "description": "Swagger documentation",
+                        "content": {
+                            "application/json": {
+                                "schema": { "type": "object" }
+                            }
+                        }
+                    }
+                }
             }
         }
     },
-    "definitions": {
-        "Member": {
-            "type": "object",
-            "properties": {
-                "id": { "type": "integer" },
-                "nomeCompleto": { "type": "string" },
-                "email": { "type": "string" },
-                "role": { "type": "string" },
-                "phone": { "type": "string" },
-                "gender": { "type": "string" },
-                "skills": { "type": "array", "items": { "type": "string" } }
+    "components": {
+        "schemas": {
+            "Client": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "name": { "type": "string", "example": "John Doe" },
+                    "email": { "type": "string", "format": "email", "example": "john@example.com" },
+                    "phone": { "type": "string", "example": "(22) 99999-8888" },
+                    "gender": { "type": "string", "example": "M" },
+                    "skills": { "type": "string", "example": "Node, React" },
+                    "data_nascimento": { "type": "string", "format": "date", "example": "1995-05-23" },
+                    "photo_url": { "type": "string", "example": "/uploads/clients/1.jpg" },
+                    "created_at": { "type": "string", "format": "date-time" },
+                    "updated_at": { "type": "string", "format": "date-time" }
+                }
+            },
+            "ClientInput": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "example": "John Doe" },
+                    "email": { "type": "string", "format": "email", "example": "john@example.com" },
+                    "password": { "type": "string", "example": "securePassword123" },
+                    "role": { "type": "string", "example": "client" },
+                    "phone": { "type": "string", "example": "(22) 99999-8888" },
+                    "gender": { "type": "string", "example": "M" },
+                    "skills": { "type": "string", "example": "Node, React" },
+                    "data_nascimento": { "type": "string", "format": "date", "example": "1995-05-23" }
+                },
+                "required": ["name", "email", "password", "role"]
+            },
+            "ClientUpdate": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "example": "Updated Name" },
+                    "email": { "type": "string", "format": "email", "example": "updated@example.com" },
+                    "phone": { "type": "string", "example": "(22) 88888-7777" }
+                }
+            },
+            "Member": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "nomeCompleto": { "type": "string", "example": "Joao Pedro Oliveira de jesus" },
+                    "email": { "type": "string", "format": "email", "example": "joao.machado@compjunior.com.br" },
+                    "role": { "type": "string", "example": "admin" },
+                    "phone": { "type": "string", "example": "(22) 997678267" },
+                    "gender": { "type": "string", "example": "F" },
+                    "skills": { "type": "string", "example": "Node, React" },
+                    "data_nascimento": { "type": "string", "example": "16/06/2004" },
+                    "photo_url": { "type": "string", "example": "/uploads/members/1.jpg" },
+                    "created_at": { "type": "string", "format": "date-time" },
+                    "updated_at": { "type": "string", "format": "date-time" }
+                }
+            },
+            "MemberUpdate": {
+                "type": "object",
+                "properties": {
+                    "nomeCompleto": { "type": "string", "example": "Updated Name" },
+                    "email": { "type": "string", "format": "email", "example": "updated@compjunior.com.br" },
+                    "role": { "type": "string", "example": "member" }
+                }
+            },
+            "Project": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "name": { "type": "string", "example": "Projeto Teste" },
+                    "description": { "type": "string", "example": "Descrição do projeto" },
+                    "status": { "type": "string", "example": "active" },
+                    "clientId": { "type": "integer", "example": 1 },
+                    "memberId": { "type": "integer", "example": 1 },
+                    "created_at": { "type": "string", "format": "date-time" },
+                    "updated_at": { "type": "string", "format": "date-time" }
+                }
+            },
+            "ProjectInput": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "example": "Projeto Teste" },
+                    "description": { "type": "string", "example": "Descrição do projeto" },
+                    "clientId": { "type": "integer", "example": 1 },
+                    "memberId": { "type": "integer", "example": 1 }
+                },
+                "required": ["name", "clientId", "memberId"]
+            },
+            "ProjectUpdate": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "example": "Projeto Atualizado" },
+                    "description": { "type": "string", "example": "Nova descrição" },
+                    "status": { "type": "string", "example": "aprovado" }
+                }
+            },
+            "Equipment": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "name": { "type": "string", "example": "Equipamento Teste" },
+                    "description": { "type": "string", "example": "Descrição do equipamento" },
+                    "created_at": { "type": "string", "format": "date-time" },
+                    "updated_at": { "type": "string", "format": "date-time" }
+                }
+            },
+            "EquipmentInput": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "example": "Equipamento Teste" },
+                    "description": { "type": "string", "example": "Descrição do equipamento" }
+                },
+                "required": ["name"]
+            },
+            "EquipmentUpdate": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "example": "Equipamento Atualizado" },
+                    "description": { "type": "string", "example": "Nova descrição" }
+                }
+            },
+            "Penalty": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "type": { "type": "string", "example": "warning" },
+                    "reason": { "type": "string", "example": "Atraso" },
+                    "date": { "type": "string", "format": "date", "example": "2025-05-20" },
+                    "memberId": { "type": "integer", "example": 1 },
+                    "created_at": { "type": "string", "format": "date-time" },
+                    "updated_at": { "type": "string", "format": "date-time" }
+                }
+            },
+            "PenaltyInput": {
+                "type": "object",
+                "properties": {
+                    "type": { "type": "string", "example": "warning" },
+                    "reason": { "type": "string", "example": "Atraso" },
+                    "date": { "type": "string", "format": "date", "example": "2025-05-20" },
+                    "memberId": { "type": "integer", "example": 1 }
+                },
+                "required": ["type", "reason", "memberId"]
+            },
+            "PenaltyUpdate": {
+                "type": "object",
+                "properties": {
+                    "type": { "type": "string", "example": "suspension" },
+                    "reason": { "type": "string", "example": "Motivo atualizado" }
+                }
             }
         },
-        "ClientRegister": {
-            "type": "object",
-            "required": ["name", "email", "password"],
-            "properties": {
-                "name": { "type": "string" },
-                "email": { "type": "string" },
-                "password": { "type": "string" },
-                "phone": { "type": "string" }
-            }
-        },
-        "ProjectCreate": {
-            "type": "object",
-            "required": ["name", "description", "clientId", "memberId"],
-            "properties": {
-                "name": { "type": "string" },
-                "description": { "type": "string" },
-                "clientId": { "type": "integer" },
-                "memberId": { "type": "integer" }
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     }
