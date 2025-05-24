@@ -2,8 +2,9 @@
     "swagger": "2.0",
     "info": {
         "version": "1.0.0",
-        "title": "API Documentation",
-        "description": "API documentation for Projeto-Zeus"
+        "title": "Documentação da API",
+        "description": "Documentação do Projeto-Zeus, uma API para gerenciamento de membros, clientes, projetos e equipamentos.",
+        "termsOfService": "http://swagger.io/terms/"
     },
     "host": "localhost:4001",
     "basePath": "/",

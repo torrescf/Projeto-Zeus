@@ -26,7 +26,8 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sua_chave_secreta_forte_aqui') as { id: number };
         const memberRepository = AppDataSource.getRepository(Member);
         
-        const member = await memberRepository.findOne({ where: { id: decoded.id.toString() } });
+        // Busca o membro pelo id, convertendo para string se necessário
+        const member = await memberRepository.findOne({ where: { id: String(decoded.id) } });
         if (!member) {
             return res.status(401).json({ message: "Invalid token" });
         }

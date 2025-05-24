@@ -27,11 +27,13 @@ CREATE TABLE IF NOT EXISTS members (
     role VARCHAR(50) NOT NULL,
     isActive BOOLEAN DEFAULT FALSE,
     skills TEXT[],
+    gender VARCHAR(20),
     phone VARCHAR(50),
     photo VARCHAR(255),
     resetPasswordToken VARCHAR(255),
     resetPasswordExpires TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_nascimento DATE
 );
 
 -- Tabela de clientes
@@ -39,11 +41,13 @@ CREATE TABLE IF NOT EXISTS clients (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
-    password VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
+    photoUrl VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    password VARCHAR(255) NOT NULL,
     resetPasswordToken VARCHAR(255),
     resetPasswordExpires TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    data_nascimento DATE
 );
 
 -- Tabela de projetos
@@ -68,6 +72,16 @@ CREATE TABLE IF NOT EXISTS equipment (
     "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "checkedOutById" INT,
     FOREIGN KEY ("checkedOutById") REFERENCES members(id) ON DELETE SET NULL
+);
+
+-- Tabela de penalidades
+CREATE TABLE IF NOT EXISTS penalty (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    reason TEXT NOT NULL,
+    date DATE NOT NULL,
+    memberId INT NOT NULL,
+    CONSTRAINT FK_member_penalty FOREIGN KEY (memberId) REFERENCES members(id) ON DELETE CASCADE
 );
 
 -- Índices para melhorar a performance

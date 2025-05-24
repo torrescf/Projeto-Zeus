@@ -1,10 +1,16 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from "../database/data-source";
 import { Member } from '../database/entities/Member';
+import { validateDateOfBirth } from '../app/utils/validateDateOfBirth';
 
 export const createMember = async (req: Request, res: Response) => {
-    const { nomeCompleto, name, email, password, role, phone, gender, skills } = req.body;
+    const { nomeCompleto, name, email, password, role, phone, gender, skills, data_nascimento } = req.body;
     const photo = req.file?.path;
+    // Validação de data de nascimento
+    const validationError = validateDateOfBirth(data_nascimento);
+    if (validationError) {
+        return res.status(400).json({ error: validationError });
+    }
     try {
         if (!email.endsWith('@compjunior.com.br')) {
             return res.status(400).json({ message: 'O email deve pertencer ao domínio compjunior.com.br' });
@@ -20,7 +26,8 @@ export const createMember = async (req: Request, res: Response) => {
             skills,
             gender,
             phone,
-            photo
+            photo,
+            data_nascimento: data_nascimento ? (data_nascimento === '' ? undefined : new Date(data_nascimento)) : undefined
         };
         const newMember = memberRepository.create(memberData);
         await memberRepository.save(newMember);

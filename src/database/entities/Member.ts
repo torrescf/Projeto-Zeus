@@ -56,4 +56,7 @@ export class Member {
 
     @OneToMany(() => Project, (project) => project.client)
     projects: Project[];
+
+    @Column({ type: 'date', nullable: true })
+    data_nascimento: Date;
 }

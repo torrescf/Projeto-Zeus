@@ -12,6 +12,6 @@ router.get("/:id", authMiddleware, (req, res) => controller.getById(req, res));
 // Permite que membros e admins atualizem projetos
 router.put("/:id/status", authMiddleware, isAdminOrMember, controller.updateStatus);
 router.put("/:id", authMiddleware, isAdminOrMember, (req, res) => controller.update(req, res));
-router.delete("/:id", authMiddleware, isAdmin, controller.delete);
+router.delete("/:id", authMiddleware, isAdminOrMember, controller.delete);
 
 export default router;

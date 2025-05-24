@@ -55,6 +55,9 @@ export class ProjectController {
     }
 
     async delete(req: Request, res: Response) {
+        if (!this.projectRepository) {
+            this.projectRepository = AppDataSource.getRepository(Project);
+        }
         const result = await this.projectRepository.delete(req.params.id);
         result.affected ? res.status(204).send() : res.status(404).json({ message: "Project not found" });
     }
@@ -69,6 +72,13 @@ export class ProjectController {
         if (!project) return res.status(404).json({ message: "Projeto não encontrado" });
         project.status = status;
         await this.projectRepository.save(project);
+        // Envia email de notificação ao cliente
+        try {
+            const { sendBudgetStatusNotification } = await import('../services/Email/nodemailer');
+            await sendBudgetStatusNotification({ project }, status);
+        } catch (err) {
+            console.error('Erro ao enviar email de notificação de status do projeto:', err);
+        }
         res.json({ message: "Status atualizado com sucesso", project });
     }
 }

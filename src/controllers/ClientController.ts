@@ -4,6 +4,7 @@ import { Client } from "../database/entities/Client";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from 'cloudinary';
 import { uploadPhoto } from '../middlewares/uploadMiddleware';
+import { validateDateOfBirth } from '../app/utils/validateDateOfBirth';
 
 cloudinary.config({
   cloud_name: 'dqalvfs9e',
@@ -13,11 +14,15 @@ cloudinary.config({
 
 export class ClientController {
     async create(req: Request, res: Response) {
-        const { name, email, password, phone } = req.body;
+        const { name, email, password, phone, data_nascimento } = req.body;
         if (!name || !email || !password) {
             return res.status(400).json({ message: "name, email e password são obrigatórios" });
         }
-
+        // Validação de data de nascimento
+        const validationError = validateDateOfBirth(data_nascimento);
+        if (validationError) {
+            return res.status(400).json({ error: validationError });
+        }
         const clientRepository = AppDataSource.getRepository(Client);
 
         // Verifica se o email já está em uso
@@ -29,12 +34,23 @@ export class ClientController {
         // Criptografa a senha
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const client = clientRepository.create({ name, email, password: hashedPassword, phone });
+        const client = clientRepository.create({ name, email, password: hashedPassword, phone, data_nascimento: data_nascimento ? new Date(data_nascimento) : undefined });
         await clientRepository.save(client);
 
         // Não retorna a senha no response
         const { password: _, ...clientWithoutPassword } = client;
-        res.status(201).json(clientWithoutPassword);
+        // Monta objeto de resposta sem sobrescrever o tipo do entity
+        const responseData: any = { ...clientWithoutPassword };
+        if (responseData.data_nascimento instanceof Date) {
+            responseData.data_nascimento_br = responseData.data_nascimento.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+        } else if (responseData.data_nascimento) {
+            // Caso venha como string ISO
+            const date = new Date(responseData.data_nascimento);
+            if (!isNaN(date.getTime())) {
+                responseData.data_nascimento_br = date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+            }
+        }
+        res.status(201).json(responseData);
     }
 
     async getAll(req: Request, res: Response) {

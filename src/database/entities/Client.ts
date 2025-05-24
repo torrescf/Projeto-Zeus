@@ -33,6 +33,9 @@ export class Client {
     @Column({ nullable: true })
     photoUrl: string;
 
+    @Column({ type: 'date', nullable: true })
+    data_nascimento: Date;
+
     @OneToMany(() => Project, (project) => project.client)
     projects: Project[];
 }

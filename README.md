@@ -33,7 +33,7 @@ Sistema interno para gestão de membros, clientes, projetos e orçamentos da Com
    git clone https://github.com/seu-usuario/projeto-zeus.git
    cd projeto-zeus
    ```
-2. Configure o arquivo `.env` com as variáveis necessárias:
+2. Crie e configure o arquivo `.env` com as variáveis necessárias:
    ```env
    PORT=4001
    JWT_SECRET=sua_chave_secreta
@@ -50,88 +50,8 @@ Sistema interno para gestão de membros, clientes, projetos e orçamentos da Com
    ```bash
    docker-compose up -d --build
    ```
-4. Acesse a API em `http://localhost:4001` e o Swagger em `/api-docs`.
 
-## 📝 Exemplos de Uso da API
-
-### Cadastro de Cliente
-**POST /client/register**
-```json
-{
-  "name": "Maria Silva",
-  "email": "maria@exemplo.com",
-  "password": "senha123",
-  "phone": "11999999999"
-}
-```
-
-### Upload de Foto de Perfil do Cliente
-**POST /client/upload-photo/{id}**
-- Form-data: campo `photo` (arquivo)
-- Retorna a URL da foto no Cloudinary
-
-### Criar Projeto
-**POST /project**
-```json
-{
-  "name": "Novo Projeto",
-  "description": "Descrição do projeto",
-  "clientId": 1,
-  "amount": 1200.50
-}
-```
-
-### Resposta de Projeto
-```json
-{
-  "id": 1,
-  "name": "Novo Projeto",
-  "description": "Descrição do projeto",
-  "amount": 1200.5,
-  "client": {
-    "id": 1,
-    "name": "Maria Silva",
-    "email": "maria@exemplo.com",
-    "phone": "11999999999",
-    "created_at": "2025-05-23T02:47:46.766Z",
-    "resetPasswordToken": null,
-    "resetPasswordExpires": null,
-    "photoUrl": "https://res.cloudinary.com/..."
-  },
-  "created_at": "2025-05-23T03:01:15.856Z",
-  "status": "em analise"
-}
-```
-
-### Buscar todos os projetos
-**GET /project**
-- Retorna lista de projetos com dados do cliente (sem senha)
-
-### Cadastro de Membro
-**POST /member**
-```json
-{
-  "nomeCompleto": "João Pedro Oliveira",
-  "email": "joao@compjunior.com.br",
-  "password": "senha123",
-  "role": "member",
-  "phone": "11999999999",
-  "skills": ["Node.js", "TypeScript"]
-}
-```
-
-### Penalidades
-**POST /penalty**
-```json
-{
-  "type": "warning",
-  "reason": "Atraso no projeto",
-  "date": "2025-05-23",
-  "memberId": 1
-}
-```
-
-## 🔐 Variáveis de Ambiente
+   ## 🔐 Variáveis de Ambiente
 Veja `.env.example` ou a seção de configuração acima.
 
 ## 🧑‍💻 Padrões de Código e Git
@@ -155,6 +75,195 @@ src/
 ## 📚 Documentação Swagger
 - O arquivo `src/app/swagger.json` está alinhado com a API real.
 - Teste endpoints diretamente pela interface Swagger.
+
+4. Acesse a API em `http://localhost:4001` e o Swagger em `/api-docs`.
+## 📝 Exemplos de Uso da API
+
+### Cadastro de Cliente
+**POST /auth/register-client**
+```json
+{
+  "name": "Maria Silva",
+  "email": "maria@exemplo.com",
+  "password": "senha123",
+  "role": "client",
+  "phone": "(11) 99999-9999",
+  "gender": "F",
+  "skills": "Node, React",
+  "data_nascimento": "1995-05-23"
+}
+```
+
+### Login
+**POST /auth/login**
+```json
+{
+  "email": "maria@exemplo.com",
+  "password": "senha123"
+}
+```
+
+### Esqueci a senha
+**POST /auth/forgot-password**
+```json
+{
+  "email": "maria@exemplo.com"
+}
+```
+
+### Redefinir senha
+**POST /auth/reset-password/:token**
+```json
+{
+  "password": "novaSenhaForte123"
+}
+```
+
+### Buscar todos os clientes
+**GET /client**
+
+### Buscar cliente por ID
+**GET /client/{client_id}**
+
+### Atualizar cliente
+**PUT /client/{client_id}**
+```json
+{
+  "name": "Cliente Atualizado",
+  "email": "cliente@estudante.ufla.br",
+  "phone": "987654321"
+}
+```
+
+### Deletar cliente
+**DELETE /client/{client_id}**
+
+### Upload de Foto de Perfil do Cliente
+**POST /upload-photo/{client_id}**
+- Form-data: campo `photo` (arquivo)
+- Retorna a URL da foto no Cloudinary
+
+---
+
+### Cadastro de Membro
+**POST /auth/register**
+```json
+{
+  "nomeCompleto": "João Pedro Oliveira",
+  "email": "joao@compjunior.com.br",
+  "password": "senha123",
+  "role": "member",
+  "phone": "(11) 99999-9999",
+  "gender": "M",
+  "skills": "Node.js, TypeScript",
+  "data_nascimento": "2000-01-01"
+}
+```
+
+### Buscar todos os membros
+**GET /list/members**
+
+### Atualizar membro
+**PUT /member/{member_id}**
+```json
+{
+  "nomeCompleto": "Membro Atualizado",
+  "email": "atualizado@compjunior.com.br",
+  "role": "admin"
+}
+```
+
+### Deletar membro
+**DELETE /member/{member_id}**
+
+### Upload de Foto de Perfil do Membro
+**POST /client/upload-photo/{member_id}**
+- Form-data: campo `photo` (arquivo)
+- Retorna a URL da foto no Cloudinary
+
+---
+
+### Criar Projeto
+**POST /project**
+```json
+{
+  "name": "Novo Projeto",
+  "description": "Descrição do projeto",
+  "clientId": 1,
+  "memberId": 1
+}
+```
+
+### Buscar todos os projetos
+**GET /project**
+
+### Atualizar projeto
+**PUT /project/{project_id}**
+```json
+{
+  "name": "Projeto Atualizado",
+  "description": "Nova descrição",
+  "status": "aprovado"
+}
+```
+
+### Deletar projeto
+**DELETE /project/{project_id}**
+
+---
+
+### Criar Equipamento
+**POST /equipment**
+```json
+{
+  "name": "Notebook Dell",
+  "description": "Notebook para desenvolvimento"
+}
+```
+
+### Buscar todos os equipamentos
+**GET /equipment**
+
+### Atualizar equipamento
+**PUT /equipment/{equipment_id}**
+```json
+{
+  "name": "Notebook Atualizado",
+  "description": "Nova descrição"
+}
+```
+
+### Deletar equipamento
+**DELETE /equipment/{equipment_id}**
+
+---
+
+### Criar Penalidade
+**POST /penalty**
+```json
+{
+  "type": "warning",
+  "reason": "Atraso",
+  "date": "2025-05-20",
+  "memberId": 1
+}
+```
+
+### Buscar todas as penalidades
+**GET /penalty**
+
+### Atualizar penalidade
+**PUT /penalty/{penalty_id}**
+```json
+{
+  "type": "suspension",
+  "reason": "Motivo atualizado"
+}
+```
+
+### Deletar penalidade
+**DELETE /penalty/{penalty_id}**
+
 
 ## 🏆 Autor
 [João Pedro Oliveira](https://github.com/torrescf)

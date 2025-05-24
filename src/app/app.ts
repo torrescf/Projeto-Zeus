@@ -36,15 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 // Swagger deve vir antes das rotas dinâmicas
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Servir arquivos estáticos do front-end
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Fallback para SPA (deve vir após as rotas da API, mas antes do 404)
-app.get('/', (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Rotas agrupadas por prefixo para melhor organização no Swagger
+// Rotas de API
 app.use('/client', clientRoutes);
 app.use('/auth', authRoutes);
 app.use('/member', memberRoutes);
@@ -61,7 +53,15 @@ app.get('/healthcheck', (req: Request, res: Response) => {
     });
 });
 
-// Tratamento de erros
+// Servir arquivos estáticos do front-end
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Fallback para SPA (deve ser o último)
+app.get('*', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Tratamento de erros (deve ser o último)
 app.use((req: Request, res: Response) => {
     res.status(404).json({ message: 'Rota não encontrada' });
 });
