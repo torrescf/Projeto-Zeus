@@ -52,7 +52,7 @@ Crie e configure o arquivo `.env` com as variáveis necessárias:
   CLOUDINARY_CLOUD_NAME=nome_da_sua_cloud
   CLOUDINARY_API_KEY=sua_api_key
   CLOUDINARY_API_SECRET=sua_api_secret
-     ```
+     
 3. Rode a API executando:
   ```bash
   ./src/utils/scripts/start-api.ps1
