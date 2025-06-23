@@ -7,9 +7,9 @@ import { uploadPhoto } from '../middlewares/uploadMiddleware';
 import { validateDateOfBirth } from '../app/utils/validateDateOfBirth';
 
 cloudinary.config({
-  cloud_name: 'dqalvfs9e',
-  api_key: '481816896419698',
-  api_secret: 'RZY2bnvKSU2puaSLMo32GqO0nRU',
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 export class ClientController {

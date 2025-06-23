@@ -33,26 +33,30 @@ Sistema interno para gestão de membros, clientes, projetos e orçamentos da Com
    git clone https://github.com/seu-usuario/projeto-zeus.git
    cd projeto-zeus
    ```
-2. Crie e configure o arquivo `.env` com as variáveis necessárias:
+2. ## 🔐 Variáveis de Ambiente
+Crie e configure o arquivo `.env` com as variáveis necessárias:
    ```env
-   PORT=4001
-   JWT_SECRET=sua_chave_secreta
-   DB_HOST=db
-   DB_PORT=5432
-   DB_USER=postgres
-   DB_PASSWORD=senha_do_seu_database
-   DB_NAME=zeus_admin
-   CLOUDINARY_CLOUD_NAME=seu_cloud_name
-   CLOUDINARY_API_KEY=sua_api_key
-   CLOUDINARY_API_SECRET=sua_api_secret
-   ```
-3. Suba os containers:
-   ```bash
-   docker-compose up -d --build
-   ```
-
-   ## 🔐 Variáveis de Ambiente
-Veja `.env.example` ou a seção de configuração acima.
+  DB_HOST=localhost
+  DB_PORT=5432
+  DB_USER=postgres
+  DB_PASSWORD=senha_do_banco
+  DB_NAME=zeus_admin
+  JWT_SECRET=sua_chave_secreta_forte_aqui
+  NODE_ENV=development
+  FRONTEND_URL=http://localhost:5173
+  PORT=4001
+  DATABASE_URL=postgres://postgres:senha_do_banco@localhost:5432/zeus_admin
+  EMAIL_USER=seu_email@gmail.com
+  EMAIL_PASS=sua_senha_de_app
+  APP_URL=http://localhost:4001
+  CLOUDINARY_CLOUD_NAME=nome_da_sua_cloud
+  CLOUDINARY_API_KEY=sua_api_key
+  CLOUDINARY_API_SECRET=sua_api_secret
+     ```
+3. Rode a API executando:
+  ```bash
+  ./src/utils/scripts/start-api.ps1
+  ```
 
 ## 🧑‍💻 Padrões de Código e Git
 - camelCase para variáveis e funções

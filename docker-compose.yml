@@ -48,7 +48,7 @@ services:
       DB_NAME: zeus_admin
       BODY_PARSER_LIMIT: 50mb
       PORT: 3000
-      JWT_SECRET: "sua_chave_secreta_forte_aqui"
+      JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
       DB_SYNC: "false" # Desativar sincronização automática em produção
     ports:
