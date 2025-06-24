@@ -5,8 +5,8 @@ import rateLimit from 'express-rate-limit';
 
 // Middleware para limitar tentativas de login
 export const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // Limite de 5 tentativas
+    windowMs: 1 * 60 * 1000, // 15 minutos
+    max: 10, // Limite de 5 tentativas
     message: {
         message: 'Muitas tentativas de login. Tente novamente mais tarde.'
     },

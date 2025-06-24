@@ -12,7 +12,6 @@ import equipmentRoutes from './routes/equipment.routes';
 import penaltyRoutes from './routes/penalty.routes';
 import projectRoutes from './routes/project.routes';
 import { createBudgetByClientId } from '../controllers/BudgetController';
-import path from 'path';
 
 /**
  * Arquivo principal de configuração e inicialização do servidor Express.
@@ -20,6 +19,9 @@ import path from 'path';
  */
 
 const app = express();
+
+// Confiança em proxy para uso correto do X-Forwarded-For (ngrok, proxies, etc)
+app.set('trust proxy', 1);
 
 // Configurações de segurança e middlewares
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', credentials: true }));
@@ -51,14 +53,6 @@ app.get('/healthcheck', (req: Request, res: Response) => {
         status: 'OK',
         timestamp: new Date().toISOString()
     });
-});
-
-// Servir arquivos estáticos do front-end
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Fallback para SPA (deve ser o último)
-app.get('*', (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Tratamento de erros (deve ser o último)

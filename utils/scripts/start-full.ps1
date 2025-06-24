@@ -98,3 +98,15 @@ try {
     Write-Host "Erro ao iniciar o ngrok. Verifique a configuração do ngrok e tente novamente."
     exit 1
 }
+
+# Inicializar o front-end da API
+Write-Host "Inicializando o front-end da API..."
+try {
+    Push-Location "..\..\src\app\zeus-frontend"
+    npm install
+    npm run dev
+    Pop-Location
+} catch {
+    Write-Host "Erro ao iniciar o front-end. Verifique as dependências e tente novamente."
+    exit 1
+}

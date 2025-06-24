@@ -58,6 +58,34 @@ Crie e configure o arquivo `.env` com as variáveis necessárias:
   ./src/utils/scripts/start-api.ps1
   ```
 
+## Expondo a API com ngrok
+
+Para acessar sua API Zeus de qualquer lugar (útil para testes externos, webhooks, etc), utilize o ngrok:
+
+### Instalação do ngrok
+
+Baixe em: https://ngrok.com/download
+
+Ou instale via npm:
+
+```sh
+npm install -g ngrok
+```
+
+### Como usar
+
+1. Inicie a API normalmente (ela deve estar rodando em http://localhost:4001).
+2. Em outro terminal, execute:
+
+```sh
+npm run start:ngrok
+```
+
+3. O ngrok irá gerar uma URL pública (https) que redireciona para sua API local.
+4. Use essa URL para acessar a API de fora da sua rede local.
+
+> Dica: O script `start:ngrok` já está configurado no `package.json`.
+
 ## 🧑‍💻 Padrões de Código e Git
 - camelCase para variáveis e funções
 - Funções pequenas, comentadas e com responsabilidade única

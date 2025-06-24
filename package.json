@@ -18,7 +18,8 @@
         "db:migrate": "typeorm-ts-node-commonjs migration:run -d \"src/database/data-source.ts\"",
         "stop:dev": "kill-port 4001",
         "swagger-autogen": "swagger-autogen ./swagger-output.json ./src/routes/*.ts",
-        "swagger-ui": "swagger-ui-express"
+        "swagger-ui": "swagger-ui-express",
+        "start:ngrok": "ngrok http 4001"
     },
     "repository": {
         "type": "git",
