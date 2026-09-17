@@ -5,8 +5,8 @@ Sistema interno para gestão de membros, clientes, projetos e orçamentos da Com
 ## 🚀 Tecnologias Utilizadas
 - **Node.js** + **TypeScript**
 - **Express**
-- **PostgreSQL** + **TypeORM**
-- **Docker** e **Docker Compose**
+- **PostgreSQL**
+- **Docker**
 - **Multer** (upload de arquivos)
 - **Cloudinary** (armazenamento de fotos de perfil)
 - **JWT** (autenticação)
